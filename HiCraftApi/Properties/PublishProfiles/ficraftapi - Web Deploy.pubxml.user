@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project>
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAlaj/6cKtr06BWb2vz04UTwAAAAACAAAAAAAQZgAAAAEAACAAAABBMm8ov8QRVzMVPE3VYL/TeTkq4FwmeHp3RU2a7ggURwAAAAAOgAAAAAIAACAAAACFwr592G1wsjZMfZkqv0rOEjyxsqcHh9t+nvVSW3wQ5IAAAAAsBiBTCPIlUm4E+kmB1+0M94dVY00Kfls5Xm7/kUH/N38a00Wmcs+0foEBt3smuP+oYUIy+Wb75uO5CTkRZwklWyt7wYfS0VtMdivS+iuLxFSJy06xvL7HyuSZWMNJUHWqOBirB5cdCD/1aOMTcvJimbNnjhmnXzQkwGaAKjceykAAAAART/rzxHgYRzvR6FAVL3ibqlAG96aw2LXHGAJxW5Uzd0/N8hf8n444gDJP5aRSKABZTJv2CbIVEbMrVT24MQ61</EncryptedPassword>
+    <History>False|2023-05-01T15:09:37.5407500Z;True|2023-05-01T17:04:58.4501594+02:00;True|2023-05-01T17:00:05.4300506+02:00;True|2023-05-01T16:50:46.0638190+02:00;True|2023-05-01T16:47:58.5139151+02:00;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="DefaultConnection">
+      <Value>Data Source=tcp:gpdbserver.database.windows.net,1433%3bInitial Catalog=ficraft_db%3bUser Id=Abady%40gpdbserver%3bPassword=Abady88%2a</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+</Project>
