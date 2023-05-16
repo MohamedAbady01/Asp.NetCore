@@ -1,12 +1,13 @@
 ﻿using Microsoft.Build.Framework;
+using System.ComponentModel.DataAnnotations;
 
 namespace HiCraftApi.Models
 {
     public class LoginModel
     {
-        [Required]
+        [System.ComponentModel.DataAnnotations.Required,]
         public String Email { get; set; }
-        [Required]  
+        [System.ComponentModel.DataAnnotations.Required, DataType(DataType.Password)] 
         public String Password { get; set; }
     }
 }

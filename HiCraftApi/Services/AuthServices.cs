@@ -66,112 +66,17 @@ namespace HiCraftApi.Services
             AuthModel.Email = user.Email;
             AuthModel.Username = user.UserName;
             AuthModel.ExpiresOn = jwtSecurityToken.ValidTo;
-            AuthModel.Roles = rolesList.ToList();
+            AuthModel.ID = user.Id;
+            AuthModel.Roles = user.Role;
+            AuthModel.FirstName = user.FirstName;
+            AuthModel.LastName = user.LastName;
+            AuthModel.Location = user.Location;
+            AuthModel.PhoneNumber = user.PhoneNumber;
+
             AuthModel.Message = "Login Successed !";
             return AuthModel;
         }
 
-        /*  public async Task<AuthModel> RegisterAsync(RegisterModel model)
-          {
-
-              if (await _userManager.FindByEmailAsync(model.Email) is not null)
-                  return new AuthModel { Message = "Email is already registered!" };
-
-              if (await _userManager.FindByNameAsync(model.Username) is not null)
-                  return new AuthModel { Message = "Username is already registered!" };
-              byte[] profilePictureBytes = null;
-              if (model.ProfilePicture != null)
-              {
-
-
-                  using var stream = new MemoryStream();
-                  await model.ProfilePicture.CopyToAsync(stream);
-                   profilePictureBytes = stream.ToArray();
-              }
-
-
-
-              if (model.Role == 0)
-              {
-                 var user = new Custmer
-                  {
-                      UserName = model.Username,
-                      Email = model.Email,
-                      FirstName = model.FirstName,
-                      LastName = model.LastName,
-                      Location = model.Location,
-                      ProfilePicture = profilePictureBytes,
-                      Role = model.Role
-                  };
-                  var result = await _userManager.CreateAsync(user, model.Password);
-                  if (!result.Succeeded)
-                  {
-                      var errors = string.Empty;
-
-                      foreach (var error in result.Errors)
-                          errors += $"{error.Description},";
-
-                      return new AuthModel { Message = errors };
-                  }
-                  await _context.Custmers.AddAsync(user);
-                  await _context.SaveChangesAsync();
-
-                  await _userManager.AddToRoleAsync(user, "Custmer");
-                  var jwtSecurityToken = await CreateJwtToken(user);
-                  return new AuthModel
-                  {
-
-                      Email = user.Email,
-                      ExpiresOn = jwtSecurityToken.ValidTo,
-                      IsAuthenticated = true,
-                      Roles = new List<String>() { "Custmer" },
-                      Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-                      Username = user.UserName
-                  };
-              }
-
-              else
-              {
-
-                  var user = new CraftManModel
-                  {
-
-                      UserName = model.Username,
-                      Email = model.Email,
-                      FirstName = model.FirstName,
-                      LastName = model.LastName,
-                      Location=model.Location,
-                      ProfilePicture = profilePictureBytes,
-                      SpecializID = (int)model.SpecializationId,
-                  };
-                  var result = await _userManager.CreateAsync(user, model.Password);
-                  if (!result.Succeeded)
-                  {
-                      var errors = string.Empty;
-
-                      foreach (var error in result.Errors)
-                          errors += $"{error.Description},";
-
-                      return new AuthModel { Message = errors };
-                  }
-                  await _context.CraftMens.AddAsync(user);
-                  await _context.SaveChangesAsync();
-                  await _userManager.AddToRoleAsync(user, "CraftMan");
-                  var jwtSecurityToken = await CreateJwtToken(user);
-
-                  return new AuthModel
-                  {
-                      Email = user.Email,
-                      ExpiresOn = jwtSecurityToken.ValidTo,
-                      IsAuthenticated = true,
-                      Roles = new List<String>() { "CraftMan" },
-                      Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-                      Username = user.UserName
-                  };
-              }
-
-
-          }*/
         public async Task<AuthModel> RegisterAsync(RegisterModel model)
         {
             if (await _userManager.FindByEmailAsync(model.Email) != null)
@@ -203,7 +108,8 @@ namespace HiCraftApi.Services
                     LastName = model.LastName,
                     Location = model.Location,
                     ProfilePicture = profilePictureBytes,
-                    Role = model.Role
+                    Role = Roles.Customer,
+                    PhoneNumber = model.PhoneNumber
                 };
             }
             else
@@ -216,7 +122,12 @@ namespace HiCraftApi.Services
                     LastName = model.LastName,
                     Location = model.Location,
                     ProfilePicture = profilePictureBytes,
+                    Role =Roles
+                    .CraftMan,
                     SpecializID = (int)model.SpecializationId,
+                    PhoneNumber = model.PhoneNumber
+                  
+
                 };
             }
 
@@ -230,7 +141,7 @@ namespace HiCraftApi.Services
             if (model.Role == 0)
             {
                 await _context.Custmers.AddAsync((Custmer)user);
-                await _userManager.AddToRoleAsync(user, "Customer");
+                await _userManager.AddToRoleAsync(user, "Custmer");
             }
             else
             {
@@ -244,12 +155,18 @@ namespace HiCraftApi.Services
             var roles = await _userManager.GetRolesAsync(user);
             return new AuthModel
             {
-                Email = user.Email,
+                Email = model.Email,
                 ExpiresOn = jwtSecurityToken.ValidTo,
                 IsAuthenticated = true,
-                Roles = roles.ToList(),
+                Roles = model.Role,
                 Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-                Username = user.UserName
+                Username = model.Username,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Location= model.Location,
+                PhoneNumber= model.PhoneNumber,
+                ID= user.Id, 
+                Message= "Register"
             };
         }
 

@@ -1,24 +1,33 @@
 ﻿using HiCraftApi.Models;
 using HiCraftApi.Services.CraftManServices;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.WebSockets;
+using System.Security.Claims;
 
 namespace HiCraftApi.Services.Custmers
 {
     public class CustmersServices : ICustmers
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CustmersServices(ApplicationDbContext context)
+        public CustmersServices(ApplicationDbContext context, UserManager<ApplicationUser> userManager,IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
-
+            _httpContextAccessor = httpContextAccessor;
+            _userManager = userManager;
 
         }
-        public async Task EditCustmer(string id, Custmrdto Custmer)
+        public async Task EditCustmer(Custmrdto Custmer)
         {
-            
-            var cust = await _context.Custmers.FirstOrDefaultAsync(c => c.Id == id);
 
+           
+            var customerid = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var cust = await _context.Custmers.FirstOrDefaultAsync(c => c.Id == customerid);
             if (cust == null)
             {
                 throw new ArgumentException("Craft not found with specified ID");
@@ -61,12 +70,12 @@ namespace HiCraftApi.Services.Custmers
             return Specializationss;
         }
 
-        public async  Task<List<CraftManModel>> GetCraftbyCategoryNameOrCraftName(string NaME)
+        public async Task<List<CraftManModel>> GetCraftbyCategoryNameOrCraftName(string NaME)
         {
             var crafts = await _context.CraftMens.Where(e => e.Specializ.Name == NaME).ToListAsync();
-            if(crafts.Count  == 0)
+            if (crafts.Count == 0)
             {
-                 crafts = await _context.CraftMens.Where(e => e.UserName == NaME).ToListAsync();
+                crafts = await _context.CraftMens.Where(e => e.UserName == NaME).ToListAsync();
             }
             return crafts.OrderBy(s => s.OverAllRating).ToList();
         }
@@ -105,6 +114,70 @@ namespace HiCraftApi.Services.Custmers
             var customer = await _context.Custmers.Where(c => c.Id == id).ToListAsync();
             return customer;
         }
+           public async Task<Review> CreateReview(Review model)
+        {
+            // Get the current customer's ID from the HttpContextAccessor
+            var customerId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var custmer = await _context.Custmers.FirstOrDefaultAsync(e => e.Id == customerId);
+            if (custmer == null)
+            {
+                throw new InvalidOperationException("Craftsmens are not allowed to create reviews.");
+            }
+            model.ClientID = customerId;
+            await _context.Reviews.AddAsync(model);
+            await _context.SaveChangesAsync();
+            return model;
+        }
+        public async Task<ServiceRequest> MakeRequest(ServiceRequest model)
+        {
+            // Get the current customer's ID from the HttpContextAccessor
+            var customerId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var custmer = await _context.Custmers.FirstOrDefaultAsync(e => e.Id == customerId);
+            if (custmer == null)
+            {
+                throw new InvalidOperationException("Craftsmens are not allowed to create Request.");
+            }
+            model.CustomerId = customerId;
+            model.Status = RequestStatus.Pending;
+            await _context.ServiceRequests.AddAsync(model);
+            await _context.SaveChangesAsync();
+            return model;
+        }
+
+        public async Task<List<ServiceRequest>> GetallRequests()
+        {
+            // Get the current customer's ID from the HttpContextAccessor
+            var customerId = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var custmer = await _context.Custmers.FirstOrDefaultAsync(e => e.Id == customerId);
+            if (custmer == null)
+            {
+                throw new InvalidOperationException("Not Found ");
+            }
+           var requests = await _context.ServiceRequests.Where(c=> c.CustomerId == customerId).ToListAsync();
+            return requests;
+        }
+        public async Task<ServiceRequest> DeleteRequest(int RequestId)
+        {
+            // Get the current customer's ID from the HttpContextAccessor
+            var customerId = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var custmer = await _context.Custmers.FirstOrDefaultAsync(e => e.Id == customerId);
+            if (custmer == null)
+            {
+                throw new InvalidOperationException("Craftmens are not allowed Delete this Request");
+            }
+            var request = await _context.ServiceRequests.FindAsync(RequestId);
+            if (request == null)
+            {
+                throw new InvalidOperationException("Request Not Found ");
+
+            }
+            _context.ServiceRequests.Remove(request);
+            await _context.SaveChangesAsync();
+            return request;
+        }
+
+
+
 
     }
 }

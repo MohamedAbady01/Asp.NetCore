@@ -31,7 +31,7 @@ namespace HiCraftApi.Controllers
             {
                 return Ok(crafts);
             }
-            return BadRequest("Specialization Not Found ");
+            return BadRequest("Craftmans Not Found ");
 
             
         }
@@ -64,8 +64,8 @@ namespace HiCraftApi.Controllers
 
 
         }
-        [HttpGet("GetCustmerById")]
-        public async Task<IActionResult> GetCustmerById(string id)
+        [HttpGet("GetCustomerById")]
+        public async Task<IActionResult> GetCustomerById(string id)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -74,11 +74,11 @@ namespace HiCraftApi.Controllers
             {
                 return Ok(Cust);
             }
-            return BadRequest("Cystomer Not Found ");
+            return BadRequest("Customer Not Found ");
 
 
         }
-        [HttpPost("EditCraft")]
+        [HttpPut("EditCraft")]
         public async Task<IActionResult> EditCraft([FromForm] Craftdto model)
         {
             var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -89,7 +89,7 @@ namespace HiCraftApi.Controllers
 
             try
             {
-                await _service.EditCraft(userId, model);
+                await _service.EditCraft( model);
                 return Ok();
             }
             catch (ArgumentException ex)
@@ -116,7 +116,49 @@ namespace HiCraftApi.Controllers
 
 
         }
+        [HttpGet("GetAllRequests")]
+        public async Task<IActionResult> GetAllRequests()
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var model = await _service.GetAllRequests();
+            if (model.Count > 0)
+            {
+                return Ok(model);
+            }
+            return BadRequest("Requests Not Found   ");
+
+
+        }
+        [HttpPost("AcceptRequest")]
+        public async Task<IActionResult> AcceptRequest(int RequestId)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var request = await _service.AcceptRequest(RequestId);
+            if (request == null)
+            {
+                return BadRequest("Error While Accepting the Request     ");
+                
+            }
+            return Ok(request);
+
+        }
+        [HttpPost("DeclineRequest")]
+        public async Task<IActionResult> DeclineRequest(int RequestId)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var request = await _service.DeclineRequest(RequestId);
+            if (request == null)
+            {
+                return BadRequest("Error While Decline the Request  ");
+
+            }
+            return Ok(request);
+
+        }
 
 
     }
-}
+    }

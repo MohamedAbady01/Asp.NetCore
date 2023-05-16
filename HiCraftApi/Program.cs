@@ -10,6 +10,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using HiCraftApi.Services.CraftManServices;
 using HiCraftApi.Services.Custmers;
+using System.Net.Mail;
+using System.Net;
+using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace HiCraftApi
 {
@@ -31,8 +34,17 @@ namespace HiCraftApi
             builder.Services.AddScoped<IAuth, AuthServices>();
             builder.Services.AddScoped<ICraftMan, CraftManServices>();
             builder.Services.AddScoped<ICustmers, CustmersServices> ();
+            builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 
+            var smtpClient = new SmtpClient("smtp.gmail.com", 587)
+            {
+                Credentials = new NetworkCredential("moelsayed8602001@gmail.com", "siaqpubhegdudkzb"),
+                EnableSsl = true
+            };
+            builder.Services.AddSingleton<IEmailService, SmptEmailService>();
+            builder.Services.AddMemoryCache();
 
+            builder.Services.AddSingleton<IUrlHelperFactory, UrlHelperFactory>();
 
             builder.Services.AddAuthentication(options =>
             {
@@ -71,11 +83,10 @@ namespace HiCraftApi
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
+        
                 app.UseSwagger();
                 app.UseSwaggerUI();
-            }
+            
             
 
             app.UseHttpsRedirection();

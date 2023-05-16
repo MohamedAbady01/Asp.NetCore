@@ -38,12 +38,12 @@ namespace HiCraftApi.Controllers
             if (!result.IsAuthenticated)
                 return BadRequest(result.Message);
 
-            return Ok(result.Message);
+            return Ok(result);
         
         
         }
-        [HttpPost("ForgetPassword")]
-        public async Task<IActionResult> ForgetPsswordAsync([FromBody] ForgetPasswordModel model)
+        [HttpPost("ChangePassword")]
+        public async Task<IActionResult> ChangePasswordAsync([FromBody] ForgetPasswordModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

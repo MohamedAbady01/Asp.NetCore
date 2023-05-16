@@ -22,6 +22,27 @@ namespace HiCraftApi.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("HiCraftApi.Controllers.ResetPasswordToken", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpirationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ResetPasswordTokens", (string)null);
+                });
+
             modelBuilder.Entity("HiCraftApi.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -134,7 +155,7 @@ namespace HiCraftApi.Migrations
 
                     b.HasIndex("CraftManId");
 
-                    b.ToTable("ImageOfPastWork", (string)null);
+                    b.ToTable("ImageOfPastWorks", (string)null);
                 });
 
             modelBuilder.Entity("HiCraftApi.Models.Review", b =>

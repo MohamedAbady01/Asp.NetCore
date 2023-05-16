@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace HiCraftApi.Services.CraftManServices
 {
@@ -9,16 +10,19 @@ namespace HiCraftApi.Services.CraftManServices
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        public CraftManServices(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public CraftManServices(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
-            _userManager= userManager;
+            _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
         }
-        public async Task EditCraft(string id, Craftdto craftMan)
+        public async Task EditCraft(Craftdto craftMan)
         {
+            var CraftId = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var craft = await _context.CraftMens
                 .Include(c => c.ImagesOfPastWorks)
-                .FirstOrDefaultAsync(c => c.Id == id);
+                .FirstOrDefaultAsync(c => c.Id == CraftId);
 
             if (craft == null)
             {
@@ -50,29 +54,29 @@ namespace HiCraftApi.Services.CraftManServices
                 craft.ImagesOfPastWorks = newImages;
             }
 
-            if (craftMan.Specializ != null)
+            if (craftMan?.Specializ != null)
             {
 
 
                 craft.SpecializID = (int) craftMan.Specializ;
             }
 
-            if (!string.IsNullOrEmpty(craftMan.FirstName))
+            if (!string.IsNullOrEmpty(craftMan?.FirstName))
             {
                 craft.FirstName = craftMan.FirstName;
             }
 
-            if (!string.IsNullOrEmpty(craftMan.LastName))
+            if (!string.IsNullOrEmpty(craftMan?.LastName))
             {
                 craft.LastName = craftMan.LastName;
             }
 
-            if (!string.IsNullOrEmpty(craftMan.Location))
+            if (!string.IsNullOrEmpty(craftMan?.Location))
             {
                 craft.Location = craftMan.Location;
             }
 
-            if (!string.IsNullOrEmpty(craftMan.PhonNumber))
+            if (!string.IsNullOrEmpty(craftMan?.PhonNumber))
             {
                 craft.PhoneNumber = craftMan.PhonNumber;
             }
@@ -137,5 +141,64 @@ namespace HiCraftApi.Services.CraftManServices
             var customer = await _context.Custmers.Where(c => c.Id == id).ToListAsync();
             return customer;
         }
+        public async Task<List<ServiceRequest>> GetAllRequests()
+        {
+            // Get the current customer's ID from the HttpContextAccessor
+            var customerId = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var custmer = await _context.Custmers.FirstOrDefaultAsync(e => e.Id == customerId);
+            if (custmer == null)
+            {
+                throw new InvalidOperationException("Not Found ");
+            }
+            var requests = await _context.ServiceRequests.Where(c => c.CustomerId == customerId).ToListAsync();
+            return requests;
+        }
+        public async Task<ServiceRequest> AcceptRequest(int RequestId)
+        {
+
+            var craftManID = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(craftManID))
+            {
+                throw new InvalidOperationException("Invalid CraftMan ID");
+            }
+
+            var serviceRequest = await _context.ServiceRequests
+                .Include(sr => sr.Craftman)
+                .FirstOrDefaultAsync(sr => sr.Id == RequestId && sr.Craftman.Id == craftManID);
+
+            if (serviceRequest == null)
+            {
+                throw new InvalidOperationException("Service Request not found");
+            }
+
+            serviceRequest.Status = RequestStatus.Accepted;
+            await _context.SaveChangesAsync();
+
+            return serviceRequest;
+        }
+        public async Task<ServiceRequest> DeclineRequest(int RequestId)
+        {
+
+            var craftManID = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(craftManID))
+            {
+                throw new InvalidOperationException("Not Authorize");
+            }
+
+            var serviceRequest = await _context.ServiceRequests
+                .Include(sr => sr.Craftman)
+                .FirstOrDefaultAsync(sr => sr.Id == RequestId && sr.Craftman.Id == craftManID);
+
+            if (serviceRequest == null)
+            {
+                throw new InvalidOperationException("Service Request not found");
+            }
+
+            serviceRequest.Status = RequestStatus.Declined;
+            await _context.SaveChangesAsync();
+
+            return serviceRequest;
+        }
+
     }
 }

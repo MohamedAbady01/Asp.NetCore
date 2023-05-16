@@ -4,6 +4,6 @@
     {
 
         public List<Review> Reviews { get; set; }
-       // public List<ServiceRequest> ServiceRequests { get; set; }
+        public List<ServiceRequest> ServiceRequests { get; set; }
     }
 }

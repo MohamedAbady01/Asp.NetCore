@@ -15,7 +15,8 @@ namespace HiCraftApi.Models
         public Specialization Specializ { get; set; }
 
 
-
+        public List<ServiceRequest> ServiceRequests { get; set; }
+        
         public int CommentID { get; set; }
         public List<Review> UserComment { get; set; }
         [Range(0, 5)]

@@ -18,17 +18,21 @@ namespace HiCraftApi.Models
 
         [Required, StringLength(128)]
         public string Email { get; set; }
-        [Required, Compare("Email")]
-        public string EmailConfirmed { get; set; }
 
-        [Required, StringLength(256)]
+
+        [Required, StringLength(256),DataType(DataType.Password)]
         public string Password { get; set; }
-        [Required, StringLength(256)]
+        [Required, Compare("Password"), DataType(DataType.Password)]
+        public string ConfirmPassword { get; set; }
+        [Required, StringLength(256),DataType(DataType
+            .PhoneNumber)]
         public string  PhoneNumber { get; set; }
         public IFormFile? ProfilePicture { get; set; }
+
+
         [Required]
         public Roles Role { get; set; }
-        public Specializationss SpecializationId { get; set; }
+        public Specializationss? SpecializationId { get; set; }
 
     }
     

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Data;
+using HiCraftApi.Models;
 
 namespace HiCraftApi.Controllers
 {
@@ -62,7 +63,7 @@ namespace HiCraftApi.Controllers
 
 
         }
-        [HttpGet("GetCustmerById")]
+        [HttpGet("GetCustomerById")]
         public async Task<IActionResult> GetCustmerById(string id)
         {
 
@@ -73,11 +74,11 @@ namespace HiCraftApi.Controllers
             {
                 return Ok(crafts);
             }
-            return BadRequest("GetCustmer Not Found ");
+            return BadRequest("GetCustomer Not Found ");
 
 
         }
-        [HttpPost("EditCustmer")]
+        [HttpPut("EditCustomer")]
         public async Task<IActionResult> EditCustmer([FromForm] Custmrdto model)
         {
             var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -88,7 +89,7 @@ namespace HiCraftApi.Controllers
 
             try
             {
-                await _service.EditCustmer(userId, model);
+                await _service.EditCustmer(model);
                 return Ok();
             }
             catch (ArgumentException ex)
@@ -114,5 +115,62 @@ namespace HiCraftApi.Controllers
 
 
         }
+        [HttpPost("CreateReview")]
+        public async Task<IActionResult> CreateReview(Review Model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var model = await _service.CreateReview(Model);
+            if (model != null)
+            {
+                return Ok(model);
+            }
+            return BadRequest("Not   Authorize ");
+
+
+        }
+        [HttpPost("MakeRequest")]
+        public async Task<IActionResult> MakeRequest(ServiceRequest Model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var model = await _service.MakeRequest(Model);
+            if (model != null)
+            {
+                return Ok(model);
+            }
+            return BadRequest("Request hasn't been  sent  ");
+
+
+        }
+        [HttpGet("GetAllRequests")]
+        public async Task<IActionResult> GetAllRequests()
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var model = await _service.GetallRequests();
+            if (model.Count> 0)
+            {
+                return Ok(model);
+            }
+            return BadRequest("Requests Not Found   ");
+
+
+        }
+        [HttpDelete("DeleteRequest")]
+        public async Task<IActionResult> DeleteRequest(int reqid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var model = await _service.DeleteRequest(reqid);
+            if (model != null)
+            {
+                return Ok(model);
+            }
+            return BadRequest("Not effected  ");
+
+
+        }
+
     }
 }
