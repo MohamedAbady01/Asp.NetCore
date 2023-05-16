@@ -70,7 +70,7 @@ namespace HiCraftApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             var crafts = await _service.GetCustmerById(id);
-            if (crafts.Count > 0)
+            if (crafts != null)
             {
                 return Ok(crafts);
             }

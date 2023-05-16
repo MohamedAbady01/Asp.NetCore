@@ -409,7 +409,7 @@ BEGIN
     IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'Id', N'Name', N'NormalizedName', N'ConcurrencyStamp') AND [object_id] = OBJECT_ID(N'[Roles]'))
         SET IDENTITY_INSERT [Roles] ON;
     EXEC(N'INSERT INTO [Roles] ([Id], [Name], [NormalizedName], [ConcurrencyStamp])
-    VALUES (N''c06c4591-84b8-4841-b822-35537bedc18e'', N''Custmer'', N''CUSTMER'', N''33fdc3a7-2d69-43da-9be7-a714051b1e08'')');
+    VALUES (N''9d4c41c3-7b69-426c-b7ce-2fa160d2a7a8'', N''Custmer'', N''CUSTMER'', N''f3b48c15-60fb-4be2-9bc7-23bc094c9d1a'')');
     IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'Id', N'Name', N'NormalizedName', N'ConcurrencyStamp') AND [object_id] = OBJECT_ID(N'[Roles]'))
         SET IDENTITY_INSERT [Roles] OFF;
 END;
@@ -420,7 +420,7 @@ BEGIN
     IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'Id', N'Name', N'NormalizedName', N'ConcurrencyStamp') AND [object_id] = OBJECT_ID(N'[Roles]'))
         SET IDENTITY_INSERT [Roles] ON;
     EXEC(N'INSERT INTO [Roles] ([Id], [Name], [NormalizedName], [ConcurrencyStamp])
-    VALUES (N''5d7f09aa-3392-46cd-8987-02cb307131fc'', N''CraftMan'', N''CRAFTMAN'', N''56209853-e38b-4a4d-85bf-d279c03b6a5f'')');
+    VALUES (N''f4c94796-0081-4208-aa2e-2f199b64572f'', N''CraftMan'', N''CRAFTMAN'', N''cf5b6644-a55a-4f98-bd89-7d169fcc524f'')');
     IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'Id', N'Name', N'NormalizedName', N'ConcurrencyStamp') AND [object_id] = OBJECT_ID(N'[Roles]'))
         SET IDENTITY_INSERT [Roles] OFF;
 END;
@@ -727,6 +727,412 @@ IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'2023
 BEGIN
     INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
     VALUES (N'20230430090645_password', N'6.0.0');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230514130436_Bio')
+BEGIN
+    ALTER TABLE [Reviews] DROP CONSTRAINT [FK_Reviews_Users_ClientNameId];
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230514130436_Bio')
+BEGIN
+    ALTER TABLE [Reviews] DROP CONSTRAINT [FK_Reviews_Users_CraftManModelId];
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230514130436_Bio')
+BEGIN
+    DROP INDEX [IX_Reviews_ClientNameId] ON [Reviews];
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230514130436_Bio')
+BEGIN
+    DROP INDEX [IX_Reviews_CraftManModelId] ON [Reviews];
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230514130436_Bio')
+BEGIN
+    DECLARE @var2 sysname;
+    SELECT @var2 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Reviews]') AND [c].[name] = N'ClientNameId');
+    IF @var2 IS NOT NULL EXEC(N'ALTER TABLE [Reviews] DROP CONSTRAINT [' + @var2 + '];');
+    ALTER TABLE [Reviews] DROP COLUMN [ClientNameId];
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230514130436_Bio')
+BEGIN
+    DECLARE @var3 sysname;
+    SELECT @var3 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Reviews]') AND [c].[name] = N'CraftManModelId');
+    IF @var3 IS NOT NULL EXEC(N'ALTER TABLE [Reviews] DROP CONSTRAINT [' + @var3 + '];');
+    ALTER TABLE [Reviews] DROP COLUMN [CraftManModelId];
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230514130436_Bio')
+BEGIN
+    ALTER TABLE [Users] ADD [Bio] nvarchar(max) NOT NULL DEFAULT N'';
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230514130436_Bio')
+BEGIN
+    DECLARE @var4 sysname;
+    SELECT @var4 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Reviews]') AND [c].[name] = N'ClientID');
+    IF @var4 IS NOT NULL EXEC(N'ALTER TABLE [Reviews] DROP CONSTRAINT [' + @var4 + '];');
+    ALTER TABLE [Reviews] ALTER COLUMN [ClientID] nvarchar(450) NOT NULL;
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230514130436_Bio')
+BEGIN
+    ALTER TABLE [Reviews] ADD [CraftsmanId] nvarchar(450) NOT NULL DEFAULT N'';
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230514130436_Bio')
+BEGIN
+    CREATE TABLE [ServiceRequests] (
+        [Id] int NOT NULL IDENTITY,
+        [CustomerId] nvarchar(450) NOT NULL,
+        [CraftmanId] nvarchar(450) NOT NULL,
+        [Request Details] nvarchar(max) NOT NULL,
+        [Status] int NOT NULL,
+        CONSTRAINT [PK_ServiceRequests] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_ServiceRequests_Users_CraftmanId] FOREIGN KEY ([CraftmanId]) REFERENCES [Users] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_ServiceRequests_Users_CustomerId] FOREIGN KEY ([CustomerId]) REFERENCES [Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230514130436_Bio')
+BEGIN
+    CREATE INDEX [IX_Reviews_ClientID] ON [Reviews] ([ClientID]);
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230514130436_Bio')
+BEGIN
+    CREATE INDEX [IX_Reviews_CraftsmanId] ON [Reviews] ([CraftsmanId]);
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230514130436_Bio')
+BEGIN
+    CREATE INDEX [IX_ServiceRequests_CraftmanId] ON [ServiceRequests] ([CraftmanId]);
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230514130436_Bio')
+BEGIN
+    CREATE INDEX [IX_ServiceRequests_CustomerId] ON [ServiceRequests] ([CustomerId]);
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230514130436_Bio')
+BEGIN
+    ALTER TABLE [Reviews] ADD CONSTRAINT [FK_Reviews_Users_ClientID] FOREIGN KEY ([ClientID]) REFERENCES [Users] ([Id]) ON DELETE CASCADE;
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230514130436_Bio')
+BEGIN
+    ALTER TABLE [Reviews] ADD CONSTRAINT [FK_Reviews_Users_CraftsmanId] FOREIGN KEY ([CraftsmanId]) REFERENCES [Users] ([Id]);
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230514130436_Bio')
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20230514130436_Bio', N'6.0.0');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230514130636_Bioo')
+BEGIN
+    DECLARE @var5 sysname;
+    SELECT @var5 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Users]') AND [c].[name] = N'Bio');
+    IF @var5 IS NOT NULL EXEC(N'ALTER TABLE [Users] DROP CONSTRAINT [' + @var5 + '];');
+    ALTER TABLE [Users] ALTER COLUMN [Bio] nvarchar(max) NULL;
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230514130636_Bioo')
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20230514130636_Bioo', N'6.0.0');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230515113816_hicraft')
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20230515113816_hicraft', N'6.0.0');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230515114637_addcolumnbio')
+BEGIN
+    EXEC sp_rename N'[Users].[Bio]', N'Bios', N'COLUMN';
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230515114637_addcolumnbio')
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20230515114637_addcolumnbio', N'6.0.0');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516113909_remove some relationships')
+BEGIN
+    ALTER TABLE [ServiceRequests] DROP CONSTRAINT [FK_ServiceRequests_Users_CraftmanId];
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516113909_remove some relationships')
+BEGIN
+    ALTER TABLE [ServiceRequests] DROP CONSTRAINT [FK_ServiceRequests_Users_CustomerId];
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516113909_remove some relationships')
+BEGIN
+    DROP INDEX [IX_ServiceRequests_CraftmanId] ON [ServiceRequests];
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516113909_remove some relationships')
+BEGIN
+    DROP INDEX [IX_ServiceRequests_CustomerId] ON [ServiceRequests];
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516113909_remove some relationships')
+BEGIN
+    DECLARE @var6 sysname;
+    SELECT @var6 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[ServiceRequests]') AND [c].[name] = N'CustomerId');
+    IF @var6 IS NOT NULL EXEC(N'ALTER TABLE [ServiceRequests] DROP CONSTRAINT [' + @var6 + '];');
+    ALTER TABLE [ServiceRequests] ALTER COLUMN [CustomerId] nvarchar(max) NOT NULL;
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516113909_remove some relationships')
+BEGIN
+    DECLARE @var7 sysname;
+    SELECT @var7 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[ServiceRequests]') AND [c].[name] = N'CraftmanId');
+    IF @var7 IS NOT NULL EXEC(N'ALTER TABLE [ServiceRequests] DROP CONSTRAINT [' + @var7 + '];');
+    ALTER TABLE [ServiceRequests] ALTER COLUMN [CraftmanId] nvarchar(max) NOT NULL;
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516113909_remove some relationships')
+BEGIN
+    ALTER TABLE [ServiceRequests] ADD [CraftManModelId] nvarchar(450) NULL;
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516113909_remove some relationships')
+BEGIN
+    ALTER TABLE [ServiceRequests] ADD [CustmerId] nvarchar(450) NULL;
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516113909_remove some relationships')
+BEGIN
+    CREATE INDEX [IX_ServiceRequests_CraftManModelId] ON [ServiceRequests] ([CraftManModelId]);
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516113909_remove some relationships')
+BEGIN
+    CREATE INDEX [IX_ServiceRequests_CustmerId] ON [ServiceRequests] ([CustmerId]);
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516113909_remove some relationships')
+BEGIN
+    ALTER TABLE [ServiceRequests] ADD CONSTRAINT [FK_ServiceRequests_Users_CraftManModelId] FOREIGN KEY ([CraftManModelId]) REFERENCES [Users] ([Id]);
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516113909_remove some relationships')
+BEGIN
+    ALTER TABLE [ServiceRequests] ADD CONSTRAINT [FK_ServiceRequests_Users_CustmerId] FOREIGN KEY ([CustmerId]) REFERENCES [Users] ([Id]);
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516113909_remove some relationships')
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20230516113909_remove some relationships', N'6.0.0');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516114943_changes on review table')
+BEGIN
+    ALTER TABLE [Reviews] DROP CONSTRAINT [FK_Reviews_Users_ClientID];
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516114943_changes on review table')
+BEGIN
+    ALTER TABLE [Reviews] DROP CONSTRAINT [FK_Reviews_Users_CraftsmanId];
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516114943_changes on review table')
+BEGIN
+    DROP INDEX [IX_Reviews_ClientID] ON [Reviews];
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516114943_changes on review table')
+BEGIN
+    DROP INDEX [IX_Reviews_CraftsmanId] ON [Reviews];
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516114943_changes on review table')
+BEGIN
+    DECLARE @var8 sysname;
+    SELECT @var8 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Reviews]') AND [c].[name] = N'CraftsmanId');
+    IF @var8 IS NOT NULL EXEC(N'ALTER TABLE [Reviews] DROP CONSTRAINT [' + @var8 + '];');
+    ALTER TABLE [Reviews] ALTER COLUMN [CraftsmanId] nvarchar(max) NOT NULL;
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516114943_changes on review table')
+BEGIN
+    DECLARE @var9 sysname;
+    SELECT @var9 = [d].[name]
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[Reviews]') AND [c].[name] = N'ClientID');
+    IF @var9 IS NOT NULL EXEC(N'ALTER TABLE [Reviews] DROP CONSTRAINT [' + @var9 + '];');
+    ALTER TABLE [Reviews] ALTER COLUMN [ClientID] nvarchar(max) NOT NULL;
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516114943_changes on review table')
+BEGIN
+    ALTER TABLE [Reviews] ADD [CraftManModelId] nvarchar(450) NULL;
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516114943_changes on review table')
+BEGIN
+    ALTER TABLE [Reviews] ADD [CustmerId] nvarchar(450) NULL;
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516114943_changes on review table')
+BEGIN
+    CREATE INDEX [IX_Reviews_CraftManModelId] ON [Reviews] ([CraftManModelId]);
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516114943_changes on review table')
+BEGIN
+    CREATE INDEX [IX_Reviews_CustmerId] ON [Reviews] ([CustmerId]);
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516114943_changes on review table')
+BEGIN
+    ALTER TABLE [Reviews] ADD CONSTRAINT [FK_Reviews_Users_CraftManModelId] FOREIGN KEY ([CraftManModelId]) REFERENCES [Users] ([Id]);
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516114943_changes on review table')
+BEGIN
+    ALTER TABLE [Reviews] ADD CONSTRAINT [FK_Reviews_Users_CustmerId] FOREIGN KEY ([CustmerId]) REFERENCES [Users] ([Id]);
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516114943_changes on review table')
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20230516114943_changes on review table', N'6.0.0');
+END;
+GO
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516142831_update review')
+BEGIN
+    EXEC sp_rename N'[Reviews].[CraftsmanId]', N'CraftmanId', N'COLUMN';
+END;
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20230516142831_update review')
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20230516142831_update review', N'6.0.0');
 END;
 GO
 

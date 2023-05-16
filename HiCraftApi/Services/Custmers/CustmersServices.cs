@@ -1,9 +1,11 @@
-﻿using HiCraftApi.Models;
+﻿using HiCraftApi.Migrations;
+using HiCraftApi.Models;
 using HiCraftApi.Services.CraftManServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using System.Net.WebSockets;
 using System.Security.Claims;
 
@@ -60,6 +62,7 @@ namespace HiCraftApi.Services.Custmers
                 cust.PhoneNumber = Custmer.PhonNumber;
             }
 
+
             await _context.SaveChangesAsync();
         }
 
@@ -86,6 +89,8 @@ namespace HiCraftApi.Services.Custmers
             var result = await (
                 from u in _context.Users
                 join i in _context.ImageOfPastWorks on u.Id equals i.CraftManId
+                join r in _context.Reviews on u.Id equals r.CraftmanId into reviews
+
                 where u.Id == id
                 select new CraftManImageModel
                 {
@@ -99,6 +104,7 @@ namespace HiCraftApi.Services.Custmers
                         ProfilePicture = u.ProfilePicture
                         ,
                         PhoneNumber = u.PhoneNumber,
+                        UserComment = reviews.ToList()
                     },
                     Image = new ImageOfPastWork
                     {
@@ -109,35 +115,50 @@ namespace HiCraftApi.Services.Custmers
 
             return result;
         }
-        public async Task<List<Custmer>> GetCustmerById(string id)
+        public async Task<Custmer> GetCustmerById(string id)
         {
-            var customer = await _context.Custmers.Where(c => c.Id == id).ToListAsync();
+            var customer = await _context.Custmers.FirstOrDefaultAsync(c => c.Id == id);
             return customer;
         }
            public async Task<Review> CreateReview(Review model)
         {
             // Get the current customer's ID from the HttpContextAccessor
-            var customerId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var custmer = await _context.Custmers.FirstOrDefaultAsync(e => e.Id == customerId);
-            if (custmer == null)
+            if (model.ClientID == null)
             {
-                throw new InvalidOperationException("Craftsmens are not allowed to create reviews.");
+                var customerId = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var custmer = await _context.Custmers.FirstOrDefaultAsync(e => e.Id == customerId);
+                if (custmer == null)
+                {
+                    throw new InvalidOperationException("Craftsmens are not allowed to create reviews.");
+                }
+                model.ClientID = customerId;
+                await _context.Reviews.AddAsync(model);
+                await _context.SaveChangesAsync();
+                return model;
             }
-            model.ClientID = customerId;
             await _context.Reviews.AddAsync(model);
             await _context.SaveChangesAsync();
             return model;
+          
+
         }
         public async Task<ServiceRequest> MakeRequest(ServiceRequest model)
         {
-            // Get the current customer's ID from the HttpContextAccessor
-            var customerId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var custmer = await _context.Custmers.FirstOrDefaultAsync(e => e.Id == customerId);
-            if (custmer == null)
+            if (model.CustomerId == null)
             {
-                throw new InvalidOperationException("Craftsmens are not allowed to create Request.");
+                // Get the current customer's ID from the HttpContextAccessor
+                var customerId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var custmer = await _context.Custmers.FirstOrDefaultAsync(e => e.Id == customerId);
+                if (custmer == null)
+                {
+                    throw new InvalidOperationException("Craftsmens are not allowed to create Request.");
+                }
+                model.CustomerId = customerId;
+                model.Status = RequestStatus.Pending;
+                await _context.ServiceRequests.AddAsync(model);
+                await _context.SaveChangesAsync();
+                return model;
             }
-            model.CustomerId = customerId;
             model.Status = RequestStatus.Pending;
             await _context.ServiceRequests.AddAsync(model);
             await _context.SaveChangesAsync();

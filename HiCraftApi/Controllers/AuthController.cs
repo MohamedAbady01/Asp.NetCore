@@ -1,5 +1,5 @@
 ﻿using HiCraftApi.Models;
-using HiCraftApi.Services;
+using HiCraftApi.Services.Auth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -55,6 +55,19 @@ namespace HiCraftApi.Controllers
 
             return Ok(result.Message);
 
+
+        }
+        [HttpPost("LogOut")]
+        public async Task<IActionResult> LogOutAsync()
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _authService.LogOutAsync();
+
+            if (!result.IsAuthenticated)
+                return Ok(result);
+            return BadRequest(result.Message);
 
         }
 

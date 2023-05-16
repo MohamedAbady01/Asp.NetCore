@@ -23,20 +23,6 @@ namespace HiCraftApi.Models
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            builder.Entity<ServiceRequest>()
-            .HasOne(s => s.Customer)
-            .WithMany(c => c.ServiceRequests)
-            .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<ServiceRequest>()
-                .HasOne(s => s.Craftman)
-                .WithMany(c => c.ServiceRequests)
-                .OnDelete(DeleteBehavior.Restrict);
-            builder.Entity<Review>()
-           .HasOne(r => r.Craftsman)
-           .WithMany(c => c.UserComment)
-           .HasForeignKey(r => r.CraftsmanId)
-           .OnDelete(DeleteBehavior.NoAction); // specify the ON DELETE NO ACTION option here
 
             builder.Entity<ApplicationUser>().ToTable("Users");
             builder.Entity<IdentityRole>().ToTable("Roles");

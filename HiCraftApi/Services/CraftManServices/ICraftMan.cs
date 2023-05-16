@@ -5,8 +5,8 @@ namespace HiCraftApi.Services.CraftManServices
     public interface ICraftMan
     {
         public Task<List<CraftManModel>> GetAllCrafts(int catid);
-        public Task<List<CraftManImageModel>> GetCraftbyId(String id);
-        public Task<List<CraftManModel>> GetCraftbyCategoryName(String categotyName );
+        public Task<List<CraftManModel>> GetCraftbyId(String id);
+        public Task<List<CraftManModel>> GetCraftbyCategoryId(int CategotyId );
         public Task EditCraft(Craftdto craftMan);
         public Task<List<Specialization>>GetAllSpecializations() ;
         public Task<List<Custmer>> GetCustmerById(string Id);

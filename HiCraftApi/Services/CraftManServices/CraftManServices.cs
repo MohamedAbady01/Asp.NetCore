@@ -80,7 +80,10 @@ namespace HiCraftApi.Services.CraftManServices
             {
                 craft.PhoneNumber = craftMan.PhonNumber;
             }
-
+            if (!string.IsNullOrEmpty(craftMan?.Bio))
+            {
+                craft.Bios = craftMan.Bio;
+            }
             await _context.SaveChangesAsync();
         }
 
@@ -99,16 +102,18 @@ namespace HiCraftApi.Services.CraftManServices
             return Specializationss;
         }
 
-        public  async Task<List<CraftManModel>> GetCraftbyCategoryName(string categotyName)
+        public  async Task<List<CraftManModel>> GetCraftbyCategoryId(int CategoryId)
         {
-            var crafts = await _context.CraftMens.Where(e => e.Specializ.Name == categotyName).ToListAsync();
+            var crafts = await _context.CraftMens.Where(e => e.Specializ.Id == CategoryId).ToListAsync();
 
             return crafts.OrderBy(s => s.OverAllRating).ToList();
         }
 
-        public async Task<List<CraftManImageModel>> GetCraftbyId(string id)
+        public async Task<List<CraftManModel>> GetCraftbyId(string id)
         {
-           
+            var result =await  _context.CraftMens.Where(u => u.Id == id).ToListAsync();
+
+           /*
             var result = await (
                 from u in _context.Users
                 join i in _context.ImageOfPastWorks on u.Id equals i.CraftManId
@@ -131,7 +136,7 @@ namespace HiCraftApi.Services.CraftManServices
                         Images = i.Images
                     }
                 }
-            ).ToListAsync();
+            ).ToListAsync();*/
 
             return result;
         }
@@ -163,8 +168,8 @@ namespace HiCraftApi.Services.CraftManServices
             }
 
             var serviceRequest = await _context.ServiceRequests
-                .Include(sr => sr.Craftman)
-                .FirstOrDefaultAsync(sr => sr.Id == RequestId && sr.Craftman.Id == craftManID);
+                .Include(sr => sr.CraftmanId)
+                .FirstOrDefaultAsync(sr => sr.Id == RequestId && sr.CraftmanId == craftManID);
 
             if (serviceRequest == null)
             {
@@ -186,8 +191,8 @@ namespace HiCraftApi.Services.CraftManServices
             }
 
             var serviceRequest = await _context.ServiceRequests
-                .Include(sr => sr.Craftman)
-                .FirstOrDefaultAsync(sr => sr.Id == RequestId && sr.Craftman.Id == craftManID);
+                .Include(sr => sr.CraftmanId)
+                .FirstOrDefaultAsync(sr => sr.Id == RequestId && sr.CraftmanId == craftManID);
 
             if (serviceRequest == null)
             {

@@ -8,13 +8,11 @@ namespace HiCraftApi.Models
 {
     public class Review
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string ClientID { get; set; }
-        public Custmer Client { get; set; }
 
-        [ForeignKey("Craftsman")]
-        public string CraftsmanId { get; set; }
-        public CraftManModel Craftsman { get; set; }
+        public string CraftmanId { get; set; }
         [Required]
         public string Details  { get; set; }
         [System.ComponentModel.DataAnnotations.Required, Range(0, 5)]

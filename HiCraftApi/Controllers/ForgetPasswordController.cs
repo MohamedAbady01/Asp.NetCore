@@ -1,6 +1,6 @@
 ﻿using HiCraftApi.Helpers;
 using HiCraftApi.Models;
-using HiCraftApi.Services;
+using HiCraftApi.Services.Auth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

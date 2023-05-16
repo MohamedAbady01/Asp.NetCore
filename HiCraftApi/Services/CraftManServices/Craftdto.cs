@@ -19,7 +19,7 @@ namespace HiCraftApi.Services.CraftManServices
         public IFormFile? ProfilePicture { get; set; }
         public List<IFormFile> ImagesOfPastWork { get; set; }
         public Specializationss Specializ { get; set; }
-
+        public string Bio { get; set; }
         public Craftdto()
         {
         }

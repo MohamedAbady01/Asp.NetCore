@@ -35,12 +35,12 @@ namespace HiCraftApi.Controllers
 
             
         }
-        [HttpGet("GetCraftByCategoryName")]
-        public async Task<IActionResult> GetCraftbyCategoryName(string CategoryName)
+        [HttpGet("GetCraftbyCategoryId")]
+        public async Task<IActionResult> GetCraftbyCategoryId(int CategoryId)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var crafts = await _service.GetCraftbyCategoryName(CategoryName);
+            var crafts = await _service.GetCraftbyCategoryId(CategoryId);
             if (crafts.Count > 0)
             {
                 return Ok(crafts);

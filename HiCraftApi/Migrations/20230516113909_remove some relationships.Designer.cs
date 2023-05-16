@@ -4,6 +4,7 @@ using HiCraftApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HiCraftApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230516113909_remove some relationships")]
+    partial class removesomerelationships
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -171,16 +173,10 @@ namespace HiCraftApi.Migrations
 
                     b.Property<string>("ClientID")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CraftManModelId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("CraftmanId")
+                    b.Property<string>("CraftsmanId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CustmerId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Details")
@@ -192,9 +188,9 @@ namespace HiCraftApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CraftManModelId");
+                    b.HasIndex("ClientID");
 
-                    b.HasIndex("CustmerId");
+                    b.HasIndex("CraftsmanId");
 
                     b.ToTable("Reviews");
                 });
@@ -427,13 +423,21 @@ namespace HiCraftApi.Migrations
 
             modelBuilder.Entity("HiCraftApi.Models.Review", b =>
                 {
-                    b.HasOne("HiCraftApi.Models.CraftManModel", null)
-                        .WithMany("UserComment")
-                        .HasForeignKey("CraftManModelId");
-
-                    b.HasOne("HiCraftApi.Models.Custmer", null)
+                    b.HasOne("HiCraftApi.Models.Custmer", "Client")
                         .WithMany("Reviews")
-                        .HasForeignKey("CustmerId");
+                        .HasForeignKey("ClientID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HiCraftApi.Models.CraftManModel", "Craftsman")
+                        .WithMany("UserComment")
+                        .HasForeignKey("CraftsmanId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+
+                    b.Navigation("Craftsman");
                 });
 
             modelBuilder.Entity("HiCraftApi.Models.ServiceRequest", b =>

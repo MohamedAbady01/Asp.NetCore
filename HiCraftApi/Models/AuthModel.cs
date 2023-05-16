@@ -8,7 +8,7 @@ namespace HiCraftApi.Models
 
         public string Message { get; set; }
         public bool IsAuthenticated { get; set; }
-        public string Username { get; set; }
+        public string UserName { get; set; }
         public string Email { get; set; }
         public Roles Roles { get; set; }
         public string Token { get; set; }
@@ -19,6 +19,7 @@ namespace HiCraftApi.Models
         public string Location { get; set; }
 
         public string PhoneNumber { get; set; }
+        public byte[] ProfilePicture { get; set; }
 
     }
 }

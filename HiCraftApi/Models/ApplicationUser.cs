@@ -15,6 +15,7 @@ namespace HiCraftApi.Models
         [Required]
         public Roles Role { get; set; }
         public Byte[]? ProfilePicture { get; set; }
+        public string? Bios  { get; set; }
     }
 
     public enum Roles
