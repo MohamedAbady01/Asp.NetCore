@@ -43,10 +43,12 @@ namespace HiCraftApi.Services.Auth
             var result = await _userManager.ResetPasswordAsync(user, token, model.Password);
             if (result.Succeeded)
             {
+                authModel.IsAuthenticated = true;
                 authModel.Message = "Password changed.";
             }
             else
             {
+                authModel.IsAuthenticated = false;
                 authModel.Message = "Failed to change password.";
             }
             return authModel;
@@ -126,9 +128,11 @@ namespace HiCraftApi.Services.Auth
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     Location = model.Location,
+                    City =model.City,
                     ProfilePicture = profilePictureBytes,
                     Role = Roles.Customer,
                     PhoneNumber = model.PhoneNumber
+                  
                 };
             }
             else
@@ -140,6 +144,7 @@ namespace HiCraftApi.Services.Auth
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     Location = model.Location,
+                    City = model.City,
                     ProfilePicture = profilePictureBytes,
                     Role = Roles
                     .CraftMan,
@@ -183,6 +188,7 @@ namespace HiCraftApi.Services.Auth
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Location = model.Location,
+                City=model.City,
                 PhoneNumber = model.PhoneNumber,
                 ID = user.Id,
                 Message = "Register"

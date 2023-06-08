@@ -12,10 +12,15 @@ namespace HiCraftApi.Models
         public string LastName { get; set; }
         [Required, MaxLength(50)]
         public string Location { get; set; }
+        [Required, MaxLength(50)]
+        public string City { get; set; }
         [Required]
         public Roles Role { get; set; }
         public Byte[]? ProfilePicture { get; set; }
         public string? Bios  { get; set; }
+        public double OverAllRating { get; set; }
+
+        public List<Review>? Reviews { get; set; }
     }
 
     public enum Roles

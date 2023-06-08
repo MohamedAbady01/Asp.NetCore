@@ -22,11 +22,12 @@ namespace HiCraftApi.Controllers
             _service = Service;
         }
         [HttpGet("GetAllCrafts")]
-        public async Task<IActionResult> GetAllCrafts(int catid)
+        public async Task<IActionResult> GetAllCrafts(int catid,string City)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var crafts = await _service.GetAllCrafts(catid);
+            var crafts = await _service.GetAllCrafts(catid, City);
+
             if(crafts.Count > 0)
             {
                 return Ok(crafts);
@@ -36,11 +37,11 @@ namespace HiCraftApi.Controllers
             
         }
         [HttpGet("GetCraftbyCategoryId")]
-        public async Task<IActionResult> GetCraftbyCategoryId(int CategoryId)
+        public async Task<IActionResult> GetCraftbyCategoryId(int CategoryId,string City)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var crafts = await _service.GetCraftbyCategoryId(CategoryId);
+            var crafts = await _service.GetCraftbyCategoryId(CategoryId, City);
             if (crafts.Count > 0)
             {
                 return Ok(crafts);
@@ -56,7 +57,7 @@ namespace HiCraftApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             var crafts = await _service.GetCraftbyId(id);
-            if (crafts.Count > 0)
+            if (crafts != null)
             {
                 return Ok(crafts);
             }
@@ -79,7 +80,7 @@ namespace HiCraftApi.Controllers
 
         }
         [HttpPut("EditCraft")]
-        public async Task<IActionResult> EditCraft([FromForm] Craftdto model)
+        public async Task<IActionResult> EditCraft(string? CraftManId,[FromForm] Craftdto model)
         {
             var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!ModelState.IsValid)
@@ -89,8 +90,8 @@ namespace HiCraftApi.Controllers
 
             try
             {
-                await _service.EditCraft( model);
-                return Ok();
+                await _service.EditCraft(CraftManId, model);
+                return Ok("Updated");
             }
             catch (ArgumentException ex)
             {
@@ -116,12 +117,27 @@ namespace HiCraftApi.Controllers
 
 
         }
+        [HttpDelete("DeleteImage")]
+        public async Task<IActionResult> DeleteImage(int id)
+        {
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var deltedImage = await _service.DeleteImage(id);
+            if (deltedImage != null)
+            {
+                return Ok("Deleted");
+            }
+            return BadRequest("Image Not Found ");
+
+
+        }
         [HttpGet("GetAllRequests")]
-        public async Task<IActionResult> GetAllRequests()
+        public async Task<IActionResult> GetAllRequests(string? UserId)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var model = await _service.GetAllRequests();
+            var model = await _service.GetAllRequests(UserId);
             if (model.Count > 0)
             {
                 return Ok(model);
@@ -130,12 +146,26 @@ namespace HiCraftApi.Controllers
 
 
         }
-        [HttpPost("AcceptRequest")]
-        public async Task<IActionResult> AcceptRequest(int RequestId)
+        [HttpGet("GetAllReviews")]
+        public async Task<IActionResult> GetAllReviews(string? UserId)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var request = await _service.AcceptRequest(RequestId);
+            var model = await _service.GetAllReviews(UserId);
+            if (model.Count > 0)
+            {
+                return Ok(model);
+            }
+            return BadRequest("Reviews Not Found   ");
+
+
+        }
+        [HttpPost("AcceptRequest")]
+        public async Task<IActionResult> AcceptRequest(string? CraftManId,int RequestId)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var request = await _service.AcceptRequest(CraftManId,RequestId);
             if (request == null)
             {
                 return BadRequest("Error While Accepting the Request     ");
@@ -145,11 +175,11 @@ namespace HiCraftApi.Controllers
 
         }
         [HttpPost("DeclineRequest")]
-        public async Task<IActionResult> DeclineRequest(int RequestId)
+        public async Task<IActionResult> DeclineRequest(string? CraftManId,int RequestId)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var request = await _service.DeclineRequest(RequestId);
+            var request = await _service.DeclineRequest(CraftManId, RequestId);
             if (request == null)
             {
                 return BadRequest("Error While Decline the Request  ");

@@ -14,6 +14,8 @@ namespace HiCraftApi.Models
         [Required]
         public string Details { get; set; }
         public RequestStatus Status { get; set; }
+        public String? CustomerName { get; set; }
+        public String? CraftName { get; set; }
     }
     public enum RequestStatus
     {

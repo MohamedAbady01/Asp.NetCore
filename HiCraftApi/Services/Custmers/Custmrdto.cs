@@ -12,6 +12,7 @@ namespace HiCraftApi.Services.Custmers
         [StringLength(50)]
         public string UserName { get; set; }
         public string Location { get; set; }
+        public string City { get; set; }
         public string PhonNumber
         { get; set;}
         public IFormFile? ProfilePicture { get; set; }

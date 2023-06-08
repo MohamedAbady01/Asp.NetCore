@@ -11,13 +11,17 @@ namespace HiCraftApi.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string ClientID { get; set; }
-
         public string CraftmanId { get; set; }
         [Required]
         public string Details  { get; set; }
-        [System.ComponentModel.DataAnnotations.Required, Range(0, 5)]
         
+
+        public string? ClientName { get; set; }
+        public string? CraftManName { get; set; }
+        [System.ComponentModel.DataAnnotations.Required, Range(0, 5)]
         public float RateOFthisWork { get; set; }
+
+        public Review() { }
     }
 
 }

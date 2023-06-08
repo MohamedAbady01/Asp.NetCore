@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
+using FluentNHibernate.Conventions.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace HiCraftApi.Models
@@ -17,13 +19,12 @@ namespace HiCraftApi.Models
 
         public List<ServiceRequest> ServiceRequests { get; set; }
         
-        public int CommentID { get; set; }
-        public List<Review> UserComment { get; set; }
-        [Range(0, 5)]
-        public double OverAllRating => UserComment?.Any() ?? false ? UserComment.Average(r => r.RateOFthisWork) : 0;
+        public int? RevuewId { get; set; }
+        [ForeignKey("ReviewId")]
+        public List<Review> Review { get; set; }
         public CraftManModel()
         {
-            UserComment = new List<Review>();
+
         }
 
     }

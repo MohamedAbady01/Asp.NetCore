@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project>
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAlaj/6cKtr06BWb2vz04UTwAAAAACAAAAAAAQZgAAAAEAACAAAAAyWRkO7S9FrFiV4t0Q6U7wNEkHfwALLG6Nxtz5SHU1wQAAAAAOgAAAAAIAACAAAAB45fkMSSMCI+7sVLse1E/Z7/yrPmWh8opKNZdJVZaEFYAAAAD9M7BnULz1xs3qgh5mzB2W/2Wiv4c0ZBQpQj3uTkvVB60ax2GUHAErDxu+NpsIOcIv2oV0nRLX2xtay7cui1WTphyJ4ekKOApN4jbicqEKRmz3MW+b9KO2hmbBnhAasJk/kKJRGzacNdmqput4aTbnWBpZ1GizFkoyW08XuVKMh0AAAAD9vV7InZibCCjJT4Nk1wTrmZ6/l7QtLkyxOApiKUx3sFQpcwx/3Rs1X6JliBeoG5rvW0C9LIkHGSUFWFscK5Tz</EncryptedPassword>
+    <History>True|2023-06-08T20:51:59.4602903Z;True|2023-06-02T19:24:31.5568584+02:00;True|2023-06-02T19:19:02.9867573+02:00;False|2023-06-02T19:17:38.2419472+02:00;True|2023-06-02T18:50:23.6653236+02:00;True|2023-06-02T18:46:05.8701115+02:00;True|2023-06-02T02:06:47.1553783+02:00;True|2023-06-01T21:15:47.2485382+02:00;True|2023-06-01T21:07:27.6419715+02:00;True|2023-06-01T01:26:16.3911726+02:00;True|2023-05-31T01:38:08.6965220+02:00;True|2023-05-31T01:23:25.0016597+02:00;True|2023-05-31T01:08:42.2046392+02:00;True|2023-05-31T01:07:19.5168854+02:00;True|2023-05-31T01:00:01.9090980+02:00;True|2023-05-31T00:50:52.2872380+02:00;True|2023-05-31T00:42:29.2846310+02:00;True|2023-05-31T00:38:28.3671500+02:00;True|2023-05-31T00:35:32.1526235+02:00;True|2023-05-31T00:32:23.4516445+02:00;False|2023-05-31T00:28:09.8050208+02:00;True|2023-05-31T00:16:37.5304424+02:00;True|2023-05-31T00:14:29.2967386+02:00;True|2023-05-31T00:10:32.5876919+02:00;True|2023-05-30T15:55:26.9599701+02:00;True|2023-05-30T01:11:29.5790529+02:00;True|2023-05-29T20:17:25.3570340+02:00;True|2023-05-25T21:25:06.5107273+02:00;True|2023-05-25T21:04:55.3566903+02:00;True|2023-05-25T19:02:34.4323744+02:00;True|2023-05-18T16:03:29.1715683+02:00;True|2023-05-18T14:55:43.1648832+02:00;True|2023-05-18T01:29:55.5523517+02:00;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="DefaultConnection">
+      <Value>Data Source=tcp:hicraftapidbserver.database.windows.net,1433%3bInitial Catalog=HiCraftApi_db%3bUser Id=Abady%40hicraftapidbserver%3bPassword=M07amed88%2a</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+</Project>

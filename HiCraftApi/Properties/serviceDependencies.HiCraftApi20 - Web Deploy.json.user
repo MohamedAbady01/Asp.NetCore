@@ -1,0 +1,28 @@
+{
+  "dependencies": {
+    "apis1": {
+      "restored": true,
+      "restoreTime": "2023-05-17T23:12:26.0469944Z"
+    },
+    "mssql1": {
+      "restored": true,
+      "restoreTime": "2023-05-17T23:17:06.4271787Z"
+    },
+    "identityapp1": {
+      "restored": true,
+      "restoreTime": "2023-05-17T23:12:28.3339923Z"
+    }
+  },
+  "parameters": {
+    "mssql1.subscriptionId": {
+      "Name": "mssql1.subscriptionId",
+      "Type": "subscription",
+      "Value": "7ad2a199-74da-4c2b-b348-869bb4ce0e3e"
+    },
+    "mssql1.resourceGroupName": {
+      "Name": "mssql1.resourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "HiCraftApi20230518010743ResourceGroup"
+    }
+  }
+}

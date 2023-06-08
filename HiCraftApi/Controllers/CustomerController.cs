@@ -21,11 +21,11 @@ namespace HiCraftApi.Controllers
             _service = custmer;
         }
         [HttpGet("GetAllCrafts")]
-        public async Task<IActionResult> GetCraftbyCategoryName(string CategoryName)
+        public async Task<IActionResult> GetCraftbyCategoryName(string CategoryName,string City)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var crafts = await _service.GetCraftbyCategoryNameOrCraftName(CategoryName);
+            var crafts = await _service.GetCraftbyCategoryNameOrCraftName(CategoryName, City);
             if (crafts.Count > 0)
             {
                 return Ok(crafts);
@@ -50,11 +50,11 @@ namespace HiCraftApi.Controllers
 
         }
         [HttpGet("GetCraftbyCategoryNameOrCraftName")]
-        public async Task<IActionResult> GetCraftbyCategoryNames(string CategoryName)
+        public async Task<IActionResult> GetCraftbyCategoryNames(string CategoryName,String City)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var crafts = await _service.GetCraftbyCategoryNameOrCraftName(CategoryName);
+            var crafts = await _service.GetCraftbyCategoryNameOrCraftName(CategoryName, City);
             if (crafts.Count > 0)
             {
                 return Ok(crafts);
@@ -79,7 +79,7 @@ namespace HiCraftApi.Controllers
 
         }
         [HttpPut("EditCustomer")]
-        public async Task<IActionResult> EditCustmer([FromForm] Custmrdto model)
+        public async Task<IActionResult> EditCustmer(string? CustomerId, [FromForm] Custmrdto model)
         {
             var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!ModelState.IsValid)
@@ -89,8 +89,8 @@ namespace HiCraftApi.Controllers
 
             try
             {
-                await _service.EditCustmer(model);
-                return Ok();
+                await _service.EditCustmer(CustomerId,model);
+                return Ok("Updated");
             }
             catch (ArgumentException ex)
             {
@@ -116,7 +116,7 @@ namespace HiCraftApi.Controllers
 
         }
         [HttpPost("CreateReview")]
-        public async Task<IActionResult> CreateReview(Review Model)
+        public async Task<IActionResult> CreateReview(Reviewsdto Model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -130,7 +130,7 @@ namespace HiCraftApi.Controllers
 
         }
         [HttpPost("MakeRequest")]
-        public async Task<IActionResult> MakeRequest(ServiceRequest Model)
+        public async Task<IActionResult> MakeRequest(Requestsdto Model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -144,11 +144,11 @@ namespace HiCraftApi.Controllers
 
         }
         [HttpGet("GetAllRequests")]
-        public async Task<IActionResult> GetAllRequests()
+        public async Task<IActionResult> GetAllRequests(string? UserId )
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var model = await _service.GetallRequests();
+            var model = await _service.GetallRequests(UserId);
             if (model.Count> 0)
             {
                 return Ok(model);
@@ -158,11 +158,11 @@ namespace HiCraftApi.Controllers
 
         }
         [HttpDelete("DeleteRequest")]
-        public async Task<IActionResult> DeleteRequest(int reqid)
+        public async Task<IActionResult> DeleteRequest(string? CustomerId, int reqid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var model = await _service.DeleteRequest(reqid);
+            var model = await _service.DeleteRequest(CustomerId, reqid);
             if (model != null)
             {
                 return Ok(model);

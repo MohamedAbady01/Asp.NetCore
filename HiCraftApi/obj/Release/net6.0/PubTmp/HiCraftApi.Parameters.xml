@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <parameters>
-  <parameter name="IIS Web Application Name" description="" value="ficraftapi" tags="IisApp">
+  <parameter name="IIS Web Application Name" description="" value="HiCraftApi20" tags="IisApp">
     <parameterEntry kind="ProviderPath" scope="IisApp" match="^C:\\Users\\Habib\\Desktop\\Asp\.NetCore\\HiCraftApi\\obj\\Release\\net6\.0\\PubTmp\\Out\\$" />
   </parameter>
 </parameters>

@@ -15,6 +15,8 @@ namespace HiCraftApi.Models
         public string Username { get; set; }
         [Required, StringLength(50)]
         public string Location { get; set; }
+        [Required, StringLength(50)]
+        public string City { get; set; }
 
         [Required, StringLength(128)]
         public string Email { get; set; }

@@ -1,7 +1,9 @@
-﻿using HiCraftApi.Models;
+﻿using HiCraftApi.Migrations;
+using HiCraftApi.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using NHibernate.Util;
 using System.Security.Claims;
 
 namespace HiCraftApi.Services.CraftManServices
@@ -17,14 +19,91 @@ namespace HiCraftApi.Services.CraftManServices
             _userManager = userManager;
             _httpContextAccessor = httpContextAccessor;
         }
-        public async Task EditCraft(Craftdto craftMan)
+        public async Task EditCraft(string? CraftManId, Craftdto craftMan)
         {
-            var CraftId = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var craft = await _context.CraftMens
-                .Include(c => c.ImagesOfPastWorks)
-                .FirstOrDefaultAsync(c => c.Id == CraftId);
+            if (CraftManId == null)
+            {
+                var CraftId = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var craft = await _context.CraftMens
+                    .Include(c => c.ImagesOfPastWorks)
+                    .FirstOrDefaultAsync(c => c.Id == CraftId);
+                if (craft == null)
+                {
+                    throw new ArgumentException("Craft not found with specified ID");
+                }
 
-            if (craft == null)
+                if (craftMan.ProfilePicture != null)
+                {
+                    using var datastream = new MemoryStream();
+                    await craftMan.ProfilePicture.CopyToAsync(datastream);
+                    craft.ProfilePicture = datastream.ToArray();
+                }
+
+                if (craftMan.ImagesOfPastWork != null)
+                {
+                    var newImages = new List<ImageOfPastWork>();
+                    foreach (var newImage in craftMan.ImagesOfPastWork)
+                    {
+                        using var stream = new MemoryStream();
+                        await newImage.CopyToAsync(stream);
+                        var imageBytes = stream.ToArray();
+                        var image = new ImageOfPastWork
+                        {
+                            Images = imageBytes
+                        };
+                        newImages.Add(image);
+                    }
+
+                    craft.ImagesOfPastWorks = newImages;
+                }
+
+                if (craftMan?.Specializ != null)
+                {
+
+
+                    craft.SpecializID = (int)craftMan.Specializ;
+                }
+                if (craftMan.UserName != null)
+                {
+
+
+                    craft.UserName = craftMan.UserName;
+                }
+
+                if (!string.IsNullOrEmpty(craftMan?.FirstName))
+                {
+                    craft.FirstName = craftMan.FirstName;
+                }
+
+                if (!string.IsNullOrEmpty(craftMan?.LastName))
+                {
+                    craft.LastName = craftMan.LastName;
+                }
+
+                if (!string.IsNullOrEmpty(craftMan?.Location))
+                {
+                    craft.Location = craftMan.Location;
+                }
+                if (!string.IsNullOrEmpty(craftMan.City))
+                {
+                    craft.City = craftMan.City;
+                }
+
+
+                if (!string.IsNullOrEmpty(craftMan?.PhonNumber))
+                {
+                    craft.PhoneNumber = craftMan.PhonNumber;
+                }
+                if (!string.IsNullOrEmpty(craftMan?.Bio))
+                {
+                    craft.Bios = craftMan.Bio;
+                }
+                await _context.SaveChangesAsync();
+            }
+            var craftman = await _context.CraftMens
+             .Include(c => c.ImagesOfPastWorks)
+            .FirstOrDefaultAsync(c => c.Id == CraftManId);
+            if (craftman == null)
             {
                 throw new ArgumentException("Craft not found with specified ID");
             }
@@ -33,7 +112,7 @@ namespace HiCraftApi.Services.CraftManServices
             {
                 using var datastream = new MemoryStream();
                 await craftMan.ProfilePicture.CopyToAsync(datastream);
-                craft.ProfilePicture = datastream.ToArray();
+                craftman.ProfilePicture = datastream.ToArray();
             }
 
             if (craftMan.ImagesOfPastWork != null)
@@ -51,50 +130,68 @@ namespace HiCraftApi.Services.CraftManServices
                     newImages.Add(image);
                 }
 
-                craft.ImagesOfPastWorks = newImages;
+                craftman.ImagesOfPastWorks = newImages;
             }
 
             if (craftMan?.Specializ != null)
             {
 
 
-                craft.SpecializID = (int) craftMan.Specializ;
+                craftman.SpecializID = (int) craftMan.Specializ;
             }
-
+            if (craftMan.UserName != null)
+            {
+                craftman.UserName = craftMan.UserName;
+            }
             if (!string.IsNullOrEmpty(craftMan?.FirstName))
             {
-                craft.FirstName = craftMan.FirstName;
+                craftman.FirstName = craftMan.FirstName;
             }
 
             if (!string.IsNullOrEmpty(craftMan?.LastName))
             {
-                craft.LastName = craftMan.LastName;
+                craftman.LastName = craftMan.LastName;
             }
 
             if (!string.IsNullOrEmpty(craftMan?.Location))
             {
-                craft.Location = craftMan.Location;
+                craftman.Location = craftMan.Location;
+            }
+            if (!string.IsNullOrEmpty(craftMan.City))
+            {
+                craftman.City = craftMan.City;
             }
 
             if (!string.IsNullOrEmpty(craftMan?.PhonNumber))
             {
-                craft.PhoneNumber = craftMan.PhonNumber;
+                craftman.PhoneNumber = craftMan.PhonNumber;
             }
             if (!string.IsNullOrEmpty(craftMan?.Bio))
             {
-                craft.Bios = craftMan.Bio;
+                craftman.Bios = craftMan.Bio;
             }
             await _context.SaveChangesAsync();
         }
 
 
-        public async Task<List<CraftManModel>> GetAllCrafts(int catid)
+        public async Task<List<CraftManModel>> GetAllCrafts(int catid,string City)
         {
-            var crafts = await _context.CraftMens.Where(e => e.SpecializID == catid).ToListAsync();
+            var crafts = await _context.CraftMens
+                           .Include(e => e.Review)
+                           .Where(e => e.SpecializID == catid && e.City == City)
+                           .ToListAsync();
 
-            return crafts.OrderBy(s=>s.OverAllRating).ToList();
+            foreach (var crafman in crafts)
+            {
+                crafman.OverAllRating = crafman.Review?.Any() == true
+                    ? Math.Round(crafman.Review.Average(rev => rev.RateOFthisWork), 2)
+                    : 0;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return crafts.OrderByDescending(s => s.OverAllRating).ToList();
         }
-
         public async Task<List<Specialization>> GetAllSpecializations()
         {
             var Specializationss = await _context.Specializations.ToListAsync();
@@ -102,43 +199,47 @@ namespace HiCraftApi.Services.CraftManServices
             return Specializationss;
         }
 
-        public  async Task<List<CraftManModel>> GetCraftbyCategoryId(int CategoryId)
+        public  async Task<List<CraftManModel>> GetCraftbyCategoryId(int CategoryId,string City)
         {
-            var crafts = await _context.CraftMens.Where(e => e.Specializ.Id == CategoryId).ToListAsync();
+            var crafts = await _context.CraftMens
+                            .Include(e => e.Review)
+                            .Where(e => e.SpecializID == CategoryId && e.City == City)
+                            .ToListAsync();
 
-            return crafts.OrderBy(s => s.OverAllRating).ToList();
+            foreach (var crafman in crafts)
+            {
+                crafman.OverAllRating = crafman.Review?.Any() == true
+                    ? Math.Round(crafman.Review.Average(rev => rev.RateOFthisWork), 2)
+                    : 0;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return crafts.OrderByDescending(s => s.OverAllRating).ToList();
         }
 
-        public async Task<List<CraftManModel>> GetCraftbyId(string id)
+        public async Task<CraftManModel> GetCraftbyId(string id)
         {
-            var result =await  _context.CraftMens.Where(u => u.Id == id).ToListAsync();
+            var craftmanQuery = await _context.CraftMens
+                .Include(craftman => craftman.ImagesOfPastWorks)
+                .Include(craftman => craftman.Specializ)
+                .FirstOrDefaultAsync(craftman => craftman.Id == id);
 
-           /*
-            var result = await (
-                from u in _context.Users
-                join i in _context.ImageOfPastWorks on u.Id equals i.CraftManId
-                where u.Id == id
-                select new CraftManImageModel
-                {
-                    CraftMan = new CraftManModel
-                    {
-                        FirstName = u.FirstName,
-                        LastName = u.LastName,
-                        Location = u.Location,
-                        UserName = u.UserName,
-                        Email = u.Email,
-                        ProfilePicture = u.ProfilePicture
-                        ,
-                        PhoneNumber = u.PhoneNumber,
-                    },
-                    Image = new ImageOfPastWork
-                    {
-                        Images = i.Images
-                    }
-                }
-            ).ToListAsync();*/
+            if (craftmanQuery != null)
+            {
+                var reviewsQuery = await _context.Reviews
+                    .Where(review => review.CraftmanId == id)
+                    .ToListAsync();
 
-            return result;
+                craftmanQuery.Review = reviewsQuery;
+               
+                craftmanQuery.OverAllRating = craftmanQuery.Review?.Any() == true
+                    ? craftmanQuery.Review.Average(r => r.RateOFthisWork)
+                    : 0;
+                craftmanQuery.OverAllRating = Math.Round(craftmanQuery.OverAllRating, 2);
+            }
+
+            return craftmanQuery;
         }
 
         public async Task<List<Custmer>> GetCustmerById(string id)
@@ -146,30 +247,66 @@ namespace HiCraftApi.Services.CraftManServices
             var customer = await _context.Custmers.Where(c => c.Id == id).ToListAsync();
             return customer;
         }
-        public async Task<List<ServiceRequest>> GetAllRequests()
+        public async Task<List<Review>> GetAllReviews(string? UserId)
         {
-            // Get the current customer's ID from the HttpContextAccessor
-            var customerId = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var custmer = await _context.Custmers.FirstOrDefaultAsync(e => e.Id == customerId);
-            if (custmer == null)
+            if (UserId == null)
             {
-                throw new InvalidOperationException("Not Found ");
+                // Get the current customer's ID from the HttpContextAccessor
+                var craftmanid = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var CraftMan = await _context.Custmers.FirstOrDefaultAsync(e => e.Id == craftmanid);
+                if (CraftMan == null)
+                {
+                    throw new InvalidOperationException("CraftMan Not Found ");
+                }
+                var Reviews = await _context.Reviews.Where(c => c.CraftmanId == craftmanid).ToListAsync();
+                return Reviews;
             }
-            var requests = await _context.ServiceRequests.Where(c => c.CustomerId == customerId).ToListAsync();
+            var reviews = await _context.Reviews.Where(c => c.CraftmanId == UserId).ToListAsync();
+            return reviews;
+
+        }
+        public async Task<List<ServiceRequest>> GetAllRequests(string? UserId)
+        {
+            if (UserId == null)
+            {
+                // Get the current customer's ID from the HttpContextAccessor
+                var craftmanid = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var custmer = await _context.Custmers.FirstOrDefaultAsync(e => e.Id == craftmanid);
+                if (custmer == null)
+                {
+                    throw new InvalidOperationException("Not Found ");
+                }
+                var Requests = await _context.ServiceRequests.Where(c => c.CustomerId == craftmanid).ToListAsync();
+                return Requests;
+            }
+            var requests = await _context.ServiceRequests.Where(c => c.CraftmanId == UserId).ToListAsync();
             return requests;
         }
-        public async Task<ServiceRequest> AcceptRequest(int RequestId)
+        public async Task<ServiceRequest> AcceptRequest(string? CraftManId, int RequestId)
         {
-
-            var craftManID = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(craftManID))
+            if (CraftManId == null)
             {
-                throw new InvalidOperationException("Invalid CraftMan ID");
-            }
+                var craftManID = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrEmpty(craftManID))
+                {
+                    throw new InvalidOperationException("Invalid CraftMan ID");
+                }
 
+                var serviceRequests = await _context.ServiceRequests
+                    .FirstOrDefaultAsync(sr => sr.Id == RequestId && sr.CraftmanId == craftManID);
+
+                if (serviceRequests == null)
+                {
+                    throw new InvalidOperationException("Service Request not found");
+                }
+
+                serviceRequests.Status = RequestStatus.Accepted;
+                await _context.SaveChangesAsync();
+
+                return serviceRequests;
+            }
             var serviceRequest = await _context.ServiceRequests
-                .Include(sr => sr.CraftmanId)
-                .FirstOrDefaultAsync(sr => sr.Id == RequestId && sr.CraftmanId == craftManID);
+            .FirstOrDefaultAsync(sr => sr.Id == RequestId && sr.CraftmanId == CraftManId);
 
             if (serviceRequest == null)
             {
@@ -180,19 +317,35 @@ namespace HiCraftApi.Services.CraftManServices
             await _context.SaveChangesAsync();
 
             return serviceRequest;
-        }
-        public async Task<ServiceRequest> DeclineRequest(int RequestId)
-        {
 
-            var craftManID = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(craftManID))
+
+        }
+        public async Task<ServiceRequest> DeclineRequest(string? CraftManId, int RequestId)
+        {
+            if (CraftManId == null)
             {
-                throw new InvalidOperationException("Not Authorize");
+                var craftManID = _httpContextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrEmpty(craftManID))
+                {
+                    throw new InvalidOperationException("Not Authorize");
+                }
+
+                var serviceRequests = await _context.ServiceRequests
+                    .FirstOrDefaultAsync(sr => sr.Id == RequestId && sr.CraftmanId == craftManID);
+
+                if (serviceRequests == null)
+                {
+                    throw new InvalidOperationException("Service Request not found");
+                }
+
+                serviceRequests.Status = RequestStatus.Declined;
+                await _context.SaveChangesAsync();
+
+                return serviceRequests;
             }
 
             var serviceRequest = await _context.ServiceRequests
-                .Include(sr => sr.CraftmanId)
-                .FirstOrDefaultAsync(sr => sr.Id == RequestId && sr.CraftmanId == craftManID);
+                .FirstOrDefaultAsync(sr => sr.Id == RequestId && sr.CraftmanId == CraftManId);
 
             if (serviceRequest == null)
             {
@@ -201,9 +354,33 @@ namespace HiCraftApi.Services.CraftManServices
 
             serviceRequest.Status = RequestStatus.Declined;
             await _context.SaveChangesAsync();
-
             return serviceRequest;
+
+        }
+        public static double CalculateOverallRating(List<Review> reviews)
+        {
+            if (reviews == null || reviews.Count == 0)
+                return 0;
+
+            double totalRating = 0;
+            foreach (var review in reviews)
+            {
+                totalRating += review.RateOFthisWork;
+            }
+
+            return totalRating / reviews.Count;
         }
 
+        public async Task<ImageOfPastWork> DeleteImage(int ImageId)
+        {
+            var Image = await _context.ImageOfPastWorks.SingleOrDefaultAsync(image => image.Id == ImageId);
+            if (Image  == null)
+            {
+                throw new InvalidOperationException("Image Not Found");
+            }
+             _context.ImageOfPastWorks.Remove(Image);
+            await _context.SaveChangesAsync();
+            return Image;
+        }
     }
 }

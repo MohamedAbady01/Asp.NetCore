@@ -40,7 +40,7 @@ namespace HiCraftApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ResetPasswordTokens");
+                    b.ToTable("ResetPasswordTokens", (string)null);
                 });
 
             modelBuilder.Entity("HiCraftApi.Models.ApplicationUser", b =>
@@ -53,6 +53,11 @@ namespace HiCraftApi.Migrations
 
                     b.Property<string>("Bios")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -97,6 +102,9 @@ namespace HiCraftApi.Migrations
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<double>("OverAllRating")
+                        .HasColumnType("float");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -158,7 +166,7 @@ namespace HiCraftApi.Migrations
 
                     b.HasIndex("CraftManId");
 
-                    b.ToTable("ImageOfPastWorks");
+                    b.ToTable("ImageOfPastWorks", (string)null);
                 });
 
             modelBuilder.Entity("HiCraftApi.Models.Review", b =>
@@ -180,9 +188,6 @@ namespace HiCraftApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CustmerId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Details")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -190,13 +195,21 @@ namespace HiCraftApi.Migrations
                     b.Property<float>("RateOFthisWork")
                         .HasColumnType("real");
 
+                    b.Property<string>("ReviewId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("custmerId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CraftManModelId");
 
-                    b.HasIndex("CustmerId");
+                    b.HasIndex("ReviewId");
 
-                    b.ToTable("Reviews");
+                    b.HasIndex("custmerId");
+
+                    b.ToTable("Reviews", (string)null);
                 });
 
             modelBuilder.Entity("HiCraftApi.Models.ServiceRequest", b =>
@@ -235,7 +248,7 @@ namespace HiCraftApi.Migrations
 
                     b.HasIndex("CustmerId");
 
-                    b.ToTable("ServiceRequests");
+                    b.ToTable("ServiceRequests", (string)null);
                 });
 
             modelBuilder.Entity("HiCraftApi.Models.Specialization", b =>
@@ -253,7 +266,7 @@ namespace HiCraftApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Specializations");
+                    b.ToTable("Specializations", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -393,10 +406,10 @@ namespace HiCraftApi.Migrations
                 {
                     b.HasBaseType("HiCraftApi.Models.ApplicationUser");
 
-                    b.Property<int>("CommentID")
+                    b.Property<int>("ImagesOfPastWorksID")
                         .HasColumnType("int");
 
-                    b.Property<int>("ImagesOfPastWorksID")
+                    b.Property<int?>("RevuewId")
                         .HasColumnType("int");
 
                     b.Property<int>("SpecializID")
@@ -428,12 +441,18 @@ namespace HiCraftApi.Migrations
             modelBuilder.Entity("HiCraftApi.Models.Review", b =>
                 {
                     b.HasOne("HiCraftApi.Models.CraftManModel", null)
-                        .WithMany("UserComment")
+                        .WithMany("Reviews")
                         .HasForeignKey("CraftManModelId");
 
-                    b.HasOne("HiCraftApi.Models.Custmer", null)
+                    b.HasOne("HiCraftApi.Models.CraftManModel", null)
+                        .WithMany("Review")
+                        .HasForeignKey("ReviewId");
+
+                    b.HasOne("HiCraftApi.Models.Custmer", "custmer")
                         .WithMany("Reviews")
-                        .HasForeignKey("CustmerId");
+                        .HasForeignKey("custmerId");
+
+                    b.Navigation("custmer");
                 });
 
             modelBuilder.Entity("HiCraftApi.Models.ServiceRequest", b =>
@@ -513,9 +532,11 @@ namespace HiCraftApi.Migrations
                 {
                     b.Navigation("ImagesOfPastWorks");
 
-                    b.Navigation("ServiceRequests");
+                    b.Navigation("Review");
 
-                    b.Navigation("UserComment");
+                    b.Navigation("Reviews");
+
+                    b.Navigation("ServiceRequests");
                 });
 
             modelBuilder.Entity("HiCraftApi.Models.Custmer", b =>
