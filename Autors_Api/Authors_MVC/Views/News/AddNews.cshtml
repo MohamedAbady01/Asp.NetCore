@@ -1,0 +1,46 @@
+﻿@model Authors_MVC.Models.Newsdto
+
+@{
+    ViewData["Title"] = "Add";
+}
+
+<h1>Create</h1>
+
+@using (Html.BeginForm("AddNews", "News", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="form-group">
+        @Html.LabelFor(model => model.Title)
+        @Html.TextBoxFor(model => model.Title, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.NewsContent)
+        @Html.TextAreaFor(model => model.NewsContent, new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.NewsContent, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.AuthorId)
+        @Html.DropDownListFor(model => model.AuthorId, ViewBag.Authors as IEnumerable<SelectListItem>, "Select Author", new { @class = "form-control" })
+        @Html.ValidationMessageFor(model => model.AuthorId, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.PublicationDate)
+        @Html.TextBoxFor(model => model.PublicationDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+        @Html.ValidationMessageFor(model => model.PublicationDate, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Image, "Upload Image")
+        <input type="file" name="Image" class="form-control-file" />
+        @Html.ValidationMessageFor(model => model.Image, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+}
+

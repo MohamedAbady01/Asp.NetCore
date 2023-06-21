@@ -1,0 +1,38 @@
+﻿@model Authors_MVC.Models.Author
+
+@{
+    ViewData["Title"] = "AddAuthor";
+}
+
+<h1>AddAuthor</h1>
+
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title">Add New Author</h4>
+        <hr />
+
+        <form asp-action="AddAuthor">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="UserName" class="control-label">Username:</label>
+                <input asp-for="UserName" class="form-control" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a class="btn btn-secondary" asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
