@@ -10,8 +10,7 @@ namespace Autors_Api.Services.News
         [System.ComponentModel.DataAnnotations.Required]
 
         public string NewsContent { get; set; }
-        [System.ComponentModel.DataAnnotations.Required]
-        public IFormFile Image { get; set; }
+        public IFormFile? Image { get; set; }
         public DateTime PublicationDate { get; set; }
         [System.ComponentModel.DataAnnotations.Required]
         public int AuthorId { get; set; }

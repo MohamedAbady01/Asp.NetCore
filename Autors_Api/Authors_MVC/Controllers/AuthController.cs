@@ -27,7 +27,7 @@ namespace Authors_MVC.Controllers
             var loginData = new { Username = model.UserName, Password = model.Password };
             var content = new StringContent(JsonConvert.SerializeObject(loginData), Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await _client.PostAsync("/login", content);
+            HttpResponseMessage response = await _client.PostAsync(BaseAddress+ "/Auth/Login", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -38,9 +38,10 @@ namespace Authors_MVC.Controllers
             {
                 // Handle login failure, e.g., display an error message
                 string errorMessage = await response.Content.ReadAsStringAsync();
+                ModelState.AddModelError("", "Failed to retrieve News."+ errorMessage);
+
                 return View();
-                throw new Exception("Login failed: " + errorMessage);
-               
+                
             }
         }
     }

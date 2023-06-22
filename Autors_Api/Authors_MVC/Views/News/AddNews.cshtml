@@ -1,46 +1,58 @@
 ﻿@model Authors_MVC.Models.Newsdto
 
 @{
-    ViewData["Title"] = "Add";
+    ViewData["Title"] = "AddNews";
 }
 
-<h1>Create</h1>
+<h1>AddNews</h1>
 
-@using (Html.BeginForm("AddNews", "News", FormMethod.Post, new { enctype = "multipart/form-data" }))
-{
-    <div class="form-group">
-        @Html.LabelFor(model => model.Title)
-        @Html.TextBoxFor(model => model.Title, new { @class = "form-control" })
-        @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
-    </div>
+<h4>Newsdto</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="AddNews" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Title" class="control-label">Title:</label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NewsContent" class="control-label">News Content:</label>
+                <input asp-for="NewsContent" class="form-control" />
+                <span asp-validation-for="NewsContent" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PublicationDate" class="control-label"></label>
+                <input asp-for="PublicationDate" type="date" class="form-control" />
+                <span asp-validation-for="PublicationDate" class="text-danger"></span>
+            </div>
 
-    <div class="form-group">
-        @Html.LabelFor(model => model.NewsContent)
-        @Html.TextAreaFor(model => model.NewsContent, new { @class = "form-control" })
-        @Html.ValidationMessageFor(model => model.NewsContent, "", new { @class = "text-danger" })
-    </div>
+            <div class="form-group">
+                <label asp-for="AuthorId" class="control-label">Author:</label>
+                @Html.DropDownListFor(model => model.AuthorId, ViewBag.Authors as SelectList, "Select Author", new { @class = "form-control" })
 
-    <div class="form-group">
-        @Html.LabelFor(model => model.AuthorId)
-        @Html.DropDownListFor(model => model.AuthorId, ViewBag.Authors as IEnumerable<SelectListItem>, "Select Author", new { @class = "form-control" })
-        @Html.ValidationMessageFor(model => model.AuthorId, "", new { @class = "text-danger" })
-    </div>
+                <span asp-validation-for="AuthorId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Image" class="control-label">Image:</label>
+                <input type="file" name="Image" class="form-control-file" aria-label="Image" />
+                <span asp-validation-for="Image" class="text-danger"></span>
+            </div>
 
-    <div class="form-group">
-        @Html.LabelFor(model => model.PublicationDate)
-        @Html.TextBoxFor(model => model.PublicationDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
-        @Html.ValidationMessageFor(model => model.PublicationDate, "", new { @class = "text-danger" })
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
     </div>
+</div>
 
-    <div class="form-group">
-        @Html.LabelFor(model => model.Image, "Upload Image")
-        <input type="file" name="Image" class="form-control-file" />
-        @Html.ValidationMessageFor(model => model.Image, "", new { @class = "text-danger" })
-    </div>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
 
-    <div class="form-group">
-        <input type="submit" value="Create" class="btn btn-primary" />
-        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-    </div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
-

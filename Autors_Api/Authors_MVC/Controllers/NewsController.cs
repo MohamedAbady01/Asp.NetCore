@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Reflection;
 using System.Text;
 
 namespace NewsModels_MVC.Controllers
@@ -18,14 +21,30 @@ namespace NewsModels_MVC.Controllers
             _client.BaseAddress = BaseAddress;
         }
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            var authors = await GetAuthors();
+
+
+
+
             List<NewsModel> News = new List<NewsModel>();
+
             HttpResponseMessage httpResponse = _client.GetAsync(_client.BaseAddress + "/News/GetAllNews").Result;
             if (httpResponse.IsSuccessStatusCode)
             {
                 string data = httpResponse.Content.ReadAsStringAsync().Result;
                 News = JsonConvert.DeserializeObject<List<NewsModel>>(data);
+
+                foreach (var news in News)
+                {
+                    var author = authors.FirstOrDefault(a => a.Id == news.AuthorId);
+                    if (author != null)
+                    {
+                        news.UserName = author.UserName;
+                    }
+                }
+
             }
 
             return View(News);
@@ -33,99 +52,95 @@ namespace NewsModels_MVC.Controllers
         [HttpGet]
         public async Task<IActionResult> AddNews()
         {
-            await SetAuthorsViewBag();
+            try
+            {
+                var authors = await GetAuthors();
+
+                ViewBag.AuthorsForMappig = authors;
+
+
+                ViewBag.Authors = new SelectList(authors, "Id", "UserName");
+                ViewBag.AuthorId = "";
+
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Failed to retrieve authors.");
+                return View();
+            }
+
+
             return View();
         }
-
         [HttpPost]
-        public async Task<IActionResult> AddNews(Newsdto news, IFormFile image)
+        public async Task<IActionResult> AddNews(Newsdto news, IFormFile Image)
         {
+
             try
             {
-                HttpResponseMessage authorsResponse = await _client.GetAsync("/authors/GetAllAuthors");
-                if (authorsResponse.IsSuccessStatusCode)
+                var authors = await GetAuthors();
+                ViewBag.Authors = new SelectList(authors, "Id", "UserName");
+
+                MultipartFormDataContent formData = new MultipartFormDataContent();
+
+                // Add the form data
+                formData.Add(new StringContent(news.Title), "Title");
+                formData.Add(new StringContent(news.NewsContent), "NewsContent");
+
+
+                formData.Add(new StringContent(news.PublicationDate.ToString("yyyy-M-dd")), "PublicationDate");
+                formData.Add(new StringContent(news.AuthorId.ToString()), "AuthorId");
+
+                // Add the image file
+                if (Image != null && Image.Length > 0)
                 {
-                    MultipartFormDataContent formData = new MultipartFormDataContent();
+                    var imageContent = new StreamContent(Image.OpenReadStream());
+                    formData.Add(imageContent, "Image", Image.FileName);
+                }
+                DateTime today = DateTime.Today;
+                DateTime weekFromToday = today.AddDays(7);
 
-                    var authorsData = await authorsResponse.Content.ReadAsStringAsync();
-                    var authors = JsonConvert.DeserializeObject<List<Author>>(authorsData);
-                    var selectedAuthor = authors.FirstOrDefault(a => a.Id == news.AuthorId);
-                    int selectedAuthorId = selectedAuthor?.Id ?? 0;
+                if (news.PublicationDate < today || news.PublicationDate > weekFromToday)
+                {
 
-                    if (image != null && image.Length > 0)
-                    {
-                        using (var memoryStream = new MemoryStream())
-                        {
-                            await image.CopyToAsync(memoryStream);
-                            byte[] imageData = memoryStream.ToArray();
-                            formData.Add(new ByteArrayContent(imageData), "image", image.FileName);
-                        }
-                    }
+                    ModelState.AddModelError("", "Publication date must be between today and a week from today.");
+                    return View();
+                }
 
-                    news.AuthorId = selectedAuthorId;
-                    news.Image = image;
+                HttpResponseMessage httpResponse = await _client.PostAsync(BaseAddress + "/News/AddNews", formData);
 
-                    var jsonData = JsonConvert.SerializeObject(news);
-                    var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-
-                    HttpResponseMessage httpResponse = await _client.PostAsync("/News/AddNews", content);
-
-                    if (httpResponse.IsSuccessStatusCode)
-                    {
-                        return RedirectToAction("Index");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("", "Failed to add news.");
-                    }
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("Index");
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Failed to retrieve authors.");
+                    string responseContent = await httpResponse.Content.ReadAsStringAsync();
+
+                    ModelState.AddModelError("", "Failed to add news: " + responseContent);
+                    return View();
                 }
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "An error occurred: " + ex.Message);
-            }
-
-            await SetAuthorsViewBag();
-
-            return View(news);
-        }
-
-        private async Task SetAuthorsViewBag()
-        {
-            try
-            {
-                HttpResponseMessage authorsResponse = await _client.GetAsync("/authors/GetAllAuthors");
-                if (authorsResponse.IsSuccessStatusCode)
-                {
-                    var authorsData = await authorsResponse.Content.ReadAsStringAsync();
-                    var authors = JsonConvert.DeserializeObject<List<Author>>(authorsData);
-                    var selectListItems = authors.Select(a => new SelectListItem { Value = a.Id.ToString(), Text = a.UserName }).ToList();
-                    ViewBag.Authors = selectListItems;
-                }
-                else
-                {
-                    ModelState.AddModelError("", "Failed to retrieve authors.");
-                    ViewBag.Authors = new List<SelectListItem>();
-                }
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "An error occurred: " + ex.Message);
-                ViewBag.Authors = new List<SelectListItem>();
+                ModelState.AddModelError("", "An error occurred.");
+                return View();
             }
         }
-
 
         [HttpGet]
-        public IActionResult Details(int id)
+        public async Task<IActionResult> EditNews(int id)
         {
+
             try
             {
-               NewsModel news = new NewsModel();
+
+                var authors = await GetAuthors();
+
+                ViewBag.Authors = new SelectList(authors, "Id", "UserName");
+                ViewBag.AuthorId = "";
+
+                NewsModel news = new NewsModel();
                 HttpResponseMessage httpResponse = _client.GetAsync(_client.BaseAddress + "/News/GetDetails/" + id).Result;
                 if (httpResponse.IsSuccessStatusCode)
                 {
@@ -135,13 +150,104 @@ namespace NewsModels_MVC.Controllers
                 }
                 else
                 {
-                    TempData["errorMessage"] = "Failed to retrieve News details.";
+
+                    return View();
+                }
+            }
+
+
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Failed to retrieve authors.");
+                return View();
+            }
+
+        }
+        [HttpPost]
+        public async Task<IActionResult> EditNews(int Id, Newsdto news, IFormFile? Image)
+        {
+            try
+            {
+
+                var authors = await GetAuthors();
+                ViewBag.Authors = new SelectList(authors, "Id", "UserName");
+
+                MultipartFormDataContent formData = new MultipartFormDataContent();
+
+                // Add the form data
+                formData.Add(new StringContent(news.Title), "Title");
+                formData.Add(new StringContent(news.NewsContent), "NewsContent");
+                formData.Add(new StringContent(news.PublicationDate.ToString("yyyy-M-dd")), "PublicationDate");
+                formData.Add(new StringContent(news.AuthorId.ToString()), "AuthorId");
+
+                if (Image != null && Image.Length > 0)
+                {
+                    var imageContent = new StreamContent(Image.OpenReadStream());
+                    formData.Add(imageContent, "Image", Image.FileName);
+                }
+                DateTime today = DateTime.Today;
+                DateTime weekFromToday = today.AddDays(7);
+
+                if (news.PublicationDate < today || news.PublicationDate > weekFromToday)
+                {
+
+                    ModelState.AddModelError("", "Publication date must be between today and a week from today.");
+                    return View();
+                }
+
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, $"{_client.BaseAddress}/News/EditNews/{Id}");
+                request.Content = formData;
+
+                HttpResponseMessage httpResponse = await _client.SendAsync(request);
+
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    string responseContent = await httpResponse.Content.ReadAsStringAsync();
+                    ModelState.AddModelError("", "Failed to edit news: " + responseContent);
                     return View();
                 }
             }
             catch (Exception ex)
             {
-                TempData["errorMessage"] = "An error occurred: " + ex.Message;
+                ModelState.AddModelError("", "An error occurred.");
+                return View();
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            try
+            {
+
+                var authors = await GetAuthors();
+                HttpResponseMessage httpResponse = _client.GetAsync(_client.BaseAddress + "/News/GetDetails/" + id).Result;
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    string data = httpResponse.Content.ReadAsStringAsync().Result;
+                    var News = JsonConvert.DeserializeObject<NewsModel>(data);
+
+                    var author = authors.FirstOrDefault(a => a.Id == News.AuthorId);
+                    if (author != null)
+                    {
+                        News.UserName = author.UserName;
+
+
+                    }
+                    return View(News);
+                }
+                else
+                {
+                    return View();
+                }
+            }
+            catch (Exception ex)
+            {
+            
                 return View();
             }
         }
@@ -151,11 +257,13 @@ namespace NewsModels_MVC.Controllers
             try
             {
                 NewsModel news = new NewsModel();
+                var authors = await GetAuthors();
                 HttpResponseMessage httpResponse = _client.GetAsync(_client.BaseAddress + "/News/GetDetails/" + id).Result;
                 if (httpResponse.IsSuccessStatusCode)
                 {
                     string data = httpResponse.Content.ReadAsStringAsync().Result;
                     news = JsonConvert.DeserializeObject<NewsModel>(data);
+                    var author = authors.FirstOrDefault(a => a.Id == news.AuthorId);
                     return View(news);
                 }
                 else
@@ -172,7 +280,7 @@ namespace NewsModels_MVC.Controllers
         }
 
         [HttpPost, ActionName("DeleteNews")]
-        public async Task<IActionResult> DeleteAuthorConfirmed(int id)
+        public async Task<IActionResult> DeleteNewsConfirmed(int id)
         {
             try
             {
@@ -196,9 +304,63 @@ namespace NewsModels_MVC.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetNewsByAuthorName(string AuthorName)
+        {
+            var authors = await GetAuthors();
+
+            List<NewsModel> News = new List<NewsModel>();
+
+            HttpResponseMessage httpResponse = await _client.GetAsync(_client.BaseAddress + "/News/GetNews/" + AuthorName);
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                string data = await httpResponse.Content.ReadAsStringAsync();
+                News = JsonConvert.DeserializeObject<List<NewsModel>>(data);
+
+                foreach (var news in News)
+                {
+                    var author = authors.FirstOrDefault(a => a.Id == news.AuthorId);
+                    if (author != null)
+                    {
+                        news.UserName = author.UserName;
+                    }
+                }
+
+                return View(News);
+            }
+            ModelState.AddModelError("", "Failed to retrieve News.");
+            return View();
+        }
+
+        private async Task<List<Author>> GetAuthors()
+        {
+            List<Author> authors = new List<Author>();
+            HttpResponseMessage httpResponse = _client.GetAsync(_client.BaseAddress + "/authors/GetAllAuthors").Result;
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                try
+                {
+                    string data = httpResponse.Content.ReadAsStringAsync().Result;
 
 
-    }
+                    authors = JsonConvert.DeserializeObject<List<Author>>(data);
 
 
+
+                    return authors;
+                }
+                catch (Exception ex)
+                {
+                    return authors;
+
+                }
+
+            }
+
+            return authors;
+        }
+
+        }
+
+    
 }

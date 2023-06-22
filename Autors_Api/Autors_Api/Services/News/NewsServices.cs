@@ -61,7 +61,7 @@ namespace Autors_Api.Services.News
 
 
 
-        public async Task UpdateNewsAsync(int id, NewsDto news, IFormFile image)
+        public async Task UpdateNewsAsync(int id, NewsDto news, IFormFile? image)
         {
             var existingNews = await _context.News.FindAsync(id);
             if (existingNews == null)
@@ -76,6 +76,10 @@ namespace Autors_Api.Services.News
                     await image.CopyToAsync(memoryStream);
                     existingNews.Image = memoryStream.ToArray();
                 }
+            }
+            else
+            {
+                existingNews.Image = existingNews.Image;  
             }
 
             existingNews.Title = news.Title;
@@ -107,6 +111,18 @@ namespace Autors_Api.Services.News
             var maxPublicationDate = currentDate.AddDays(7);
 
             return publicationDate >= currentDate && publicationDate <= maxPublicationDate;
+        }
+
+        public async Task<List<NewsModel>> GetNewsByAuthorName(string AuthorName)
+        {
+            var author =  await _context.Authors.FirstOrDefaultAsync(a => a.UserName == AuthorName) ;
+
+            if(author == null)
+            {
+                throw new Exception("author not found");
+            }
+            var News = await _context.News.Where(n=> n.AuthorId== author.Id).ToListAsync();
+            return (News);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿@model IEnumerable<Authors_MVC.Models.NewsModel>
-
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "News";
 }
 
 <style>
@@ -36,6 +35,7 @@
 
 <h1>Index</h1>
 
+
 <p>
     <a asp-action="AddNews" class="btn btn-primary">Create New</a>
 </p>
@@ -56,22 +56,14 @@
                     <h5 class="card-title">@Html.DisplayFor(modelItem => item.Title)</h5>
                     <p class="card-content">@Html.DisplayFor(modelItem => item.NewsContent)</p>
                     <p>
-                        Author: @{
-                            var author = Model.FirstOrDefault(a => a.AuthorId == item.AuthorId)?.Author;
-                            if (author == null || author.UserName == null)
-                            {
-                                <text>Not Found</text>
-                            }
-                            else
-                            {
-                                @author.UserName
-                            }
-                        }
+
+Author:                     @Html.DisplayFor(modelItem => item.UserName)
+
                     </p>
                     <p>@Html.DisplayFor(modelItem => item.PublicationDate)</p>
                 </div>
                 <div class="card-actions">
-                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-primary btn-sm" })
+                    @Html.ActionLink("EditNews", "EditNews", new { id = item.Id }, new { @class = "btn btn-primary btn-sm" })
                     @Html.ActionLink("Details", "Details", new { id = item.Id }, new { @class = "btn btn-info btn-sm" })
                     @Html.ActionLink("DeleteNews", "DeleteNews", new { id = item.Id }, new { @class = "btn btn-danger btn-sm" })
                 </div>

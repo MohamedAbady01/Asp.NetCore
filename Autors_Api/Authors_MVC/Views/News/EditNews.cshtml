@@ -1,0 +1,65 @@
+﻿@model Authors_MVC.Models.NewsModel
+
+@{
+    ViewData["Title"] = "EditNews";
+}
+
+<h1>EditNews</h1>
+
+<h4>Newsdto</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="EditNews" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Title" class="control-label">Title:</label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NewsContent" class="control-label">News Content:</label>
+                <input asp-for="NewsContent" class="form-control" />
+                <span asp-validation-for="NewsContent" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PublicationDate" class="control-label">Publication Date:</label>
+                <input asp-for="PublicationDate" class="form-control" />
+                <span asp-validation-for="PublicationDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AuthorId" class="control-label">Author:</label>
+                @Html.DropDownListFor(model => model.AuthorId, ViewBag.Authors as SelectList, "Select Author", new { @class = "form-control" })
+                <span asp-validation-for="AuthorId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Image" class="control-label">Image:</label>
+                <input type="file" name="Image" class="form-control-file" aria-label="Image" />
+                <span asp-validation-for="Image" class="text-danger"></span>
+
+
+                
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<div>
+    <div class="form-group">
+
+
+
+    </div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

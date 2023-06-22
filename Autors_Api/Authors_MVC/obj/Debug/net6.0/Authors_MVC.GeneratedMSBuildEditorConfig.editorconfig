@@ -40,14 +40,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQXV0aFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Autors_Api/Authors_MVC/Views/Home/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[D:/Autors_Api/Authors_MVC/Views/Home/Privacy.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
 [D:/Autors_Api/Authors_MVC/Views/News/AddNews.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xBZGROZXdzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -58,6 +50,14 @@ build_metadata.AdditionalFiles.CssScope =
 
 [D:/Autors_Api/Authors_MVC/Views/News/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Autors_Api/Authors_MVC/Views/News/EditNews.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xFZGl0TmV3cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/Autors_Api/Authors_MVC/Views/News/GetNewsByAuthorName.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmV3c1xHZXROZXdzQnlBdXRob3JOYW1lLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/Autors_Api/Authors_MVC/Views/News/Index.cshtml]

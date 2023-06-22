@@ -28,7 +28,7 @@ namespace Autors_Api.Services.Auth
         {
 
                 var AuthModel = new AuthModel();
-                var user = await _userManager.FindByEmailAsync(model.UserName);
+                var user = await _userManager.FindByNameAsync(model.UserName);
                 if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
                 {
                     AuthModel.Message = "UserName or Password is incorrect!";

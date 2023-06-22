@@ -36,6 +36,16 @@ namespace Autors_Api.Controllers
             }
             return Ok(news);
         }
+        [HttpGet("GetNews/{AuthorName}")]
+        public async Task<ActionResult< List<NewsModel>>> GetNews(string AuthorName)
+        {
+            var news = await _newsService.GetNewsByAuthorName(AuthorName);
+            if (news == null)
+            {
+                return NotFound();
+            }
+            return Ok(news);
+        }
 
         [HttpPost("AddNews")]
         public async Task<ActionResult> AddNews([FromForm] NewsDto news)

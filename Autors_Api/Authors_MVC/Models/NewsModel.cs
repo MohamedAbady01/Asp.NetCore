@@ -10,13 +10,14 @@ namespace Authors_MVC.Models
         public string Title { get; set; }
         [System.ComponentModel.DataAnnotations.Required]
         public string NewsContent { get; set; }
-
+        public string UserName { get; set; }
 
         [System.ComponentModel.DataAnnotations.Required]
         public Byte[] Image { get; set; }
 
 
         [DataType(DataType.DateTime)]
+        [PublicationDateValidation]
         public DateTime PublicationDate { get; set; }
 
         public DateTime CreationDate { get; set; }
@@ -25,5 +26,9 @@ namespace Authors_MVC.Models
 
         [ForeignKey("AuthorId")]
         public Author Author { get; set; }
+
+
     }
 }
+
+

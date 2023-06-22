@@ -5,7 +5,7 @@ VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Autors_Api", "Autors_Api\Autors_Api.csproj", "{0EBE9EF6-9E2A-41F2-9957-3DD0189F3A84}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authors_MVC", "Authors_MVC\Authors_MVC.csproj", "{06152340-EB1C-491F-9261-B7CC6FF7C68D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authors_MVC", "Authors_MVC\Authors_MVC.csproj", "{06152340-EB1C-491F-9261-B7CC6FF7C68D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
